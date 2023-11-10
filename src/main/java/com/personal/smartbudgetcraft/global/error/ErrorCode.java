@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
  */
 @Getter
 public enum ErrorCode {
-  ;
+  // Member
+  MEMBER_WRONG_PASSWORD_CONFIRM("비밀번호가 서로 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
+  MEMBER_ACCOUNT_DUPLICATE("중복된 아이디 입니다.", HttpStatus.BAD_REQUEST);
 
   //오류 메시지
   private final String message;

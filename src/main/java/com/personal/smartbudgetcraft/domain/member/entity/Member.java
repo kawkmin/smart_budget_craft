@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -45,4 +46,11 @@ public class Member extends BaseEntity {
   @Column(name = "role", nullable = false)
   private Role role;
 
+  @Builder
+  public Member(Long id, String account, String password, Role role) {
+    this.id = id;
+    this.account = account;
+    this.password = password;
+    this.role = role;
+  }
 }
