@@ -1,4 +1,4 @@
-package com.personal.smartbudgetcraft.global.util.format.response;
+package com.personal.smartbudgetcraft.global.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class ResponseApi {
+public class ApiResDto {
 
   private static final String STATUS_SUCCESS = "success";
   private static final String STATUS_FAIL = "fail";
@@ -27,8 +27,8 @@ public class ResponseApi {
    * @param data 데이터 내용
    * @return 성공 APIResponse
    */
-  public static ResponseApi toSuccessForm(Object data) {
-    return new ResponseApi(STATUS_SUCCESS, null, data);
+  public static ApiResDto toSuccessForm(Object data) {
+    return new ApiResDto(STATUS_SUCCESS, null, data);
   }
 
   /**
@@ -37,8 +37,8 @@ public class ResponseApi {
    * @param message 실패 메시지
    * @return 실패 APIResponse
    */
-  public static ResponseApi toFailForm(String message) {
-    return new ResponseApi(STATUS_FAIL, message, null);
+  public static ApiResDto toFailForm(String message) {
+    return new ApiResDto(STATUS_FAIL, message, null);
   }
 
   /**
@@ -47,7 +47,7 @@ public class ResponseApi {
    * @param message 에러 메시지
    * @return 에러 APIResponse
    */
-  public static ResponseApi toErrorForm(String message) {
-    return new ResponseApi(STATUS_ERROR, message, null);
+  public static ApiResDto toErrorForm(String message) {
+    return new ApiResDto(STATUS_ERROR, message, null);
   }
 }
