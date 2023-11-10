@@ -1,0 +1,45 @@
+== 회원
+
+=== 회원 가입
+
+Request
+
+include::{snippets}/signup/회원_가입이_정상적으로_성공한다/http-request.adoc[]
+
+Response
+
+- 201 Created
+
+include::{snippets}/signup/회원_가입이_정상적으로_성공한다/http-response.adoc[]
+
+- 400 BadRequest
+
+계정명이 올바르지 않을 때
+
+include::{snippets}/signup/회원_계정명이_올바르지_않으면_회원_가입에_실패한다/http-response.adoc[]
+
+비밀번호가 올바르지 않을 때
+
+include::{snippets}/signup/회원_비밀번호가_올바르지_않으면_회원_가입에_실패한다/http-response.adoc[]
+
+비밀번호가 서로 일치하지 않을 때
+
+include::{snippets}/signup/비밀번호랑_비밀번호_확인이_같지_않으면_회원_가입에_실패한다/http-response.adoc[]
+
+=== 아이디 중복 확인
+
+Request
+
+include::{snippets}/signup/중복된_계정명을_가진_회원이_없으면_중복_확인에_성공한다/http-request.adoc[]
+
+Response
+
+- 204
+
+include::{snippets}/signup/중복된_계정명을_가진_회원이_없으면_중복_확인에_성공한다/http-response.adoc[]
+
+- 400
+
+중복된 계정명이 있을 때
+include::{snippets}/signup/중복된_계정명을_가진_회원이_있으면_중복_확인에_실패한다/http-response.adoc[]
+
