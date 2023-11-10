@@ -1,10 +1,10 @@
-package com.personal.smartbugetcraft;
+package com.personal.smartbudgetcraft;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SmartBugetCraftApplicationTests {
+class SmartBudgetCraftApplicationTests {
 
   @Test
   void contextLoads() {
