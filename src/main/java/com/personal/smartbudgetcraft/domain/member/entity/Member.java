@@ -1,14 +1,19 @@
 package com.personal.smartbudgetcraft.domain.member.entity;
 
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
+import com.personal.smartbudgetcraft.domain.member.entity.budgettracking.BudgetTracking;
 import com.personal.smartbudgetcraft.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -33,6 +38,12 @@ public class Member extends BaseEntity {
   @Column(name = "member_id", nullable = false)
   private Long id;
 
+  // 재산 트래킹 (1:1)
+  // 맨 처음 모든 속성 0으로 초기화
+  @OneToOne(fetch = LAZY, cascade = ALL, orphanRemoval = true)
+  @JoinColumn(name = "budget_tracking_id", nullable = false)
+  private BudgetTracking budgetTracking;
+
   // 계정의 아이디
   @Column(name = "account", nullable = false, length = MAX_ACCOUNT_LENGTH)
   private String account;
@@ -47,8 +58,10 @@ public class Member extends BaseEntity {
   private Role role;
 
   @Builder
-  public Member(Long id, String account, String password, Role role) {
+  public Member(Long id, String account, String password, Role role,
+      BudgetTracking budgetTracking) {
     this.id = id;
+    this.budgetTracking = budgetTracking;
     this.account = account;
     this.password = password;
     this.role = role;

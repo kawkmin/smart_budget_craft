@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,4 +34,23 @@ public class BudgetTracking {
   // 총 지출 금액
   @Column(name = "total_expenditure_cost", nullable = false)
   private Integer totalExpenditureCost;
+
+  @Builder
+  public BudgetTracking(Long id, Integer totalDepositCost, Integer totalExpenditureCost) {
+    this.id = id;
+    this.totalDepositCost = totalDepositCost;
+    this.totalExpenditureCost = totalExpenditureCost;
+  }
+
+  /**
+   * 처음 생성 하거나, 매달 처음 요일 일 때, 재산 초기화
+   *
+   * @return 초기화된 재산 트래킹
+   */
+  public static BudgetTracking resetBudget() {
+    return BudgetTracking.builder()
+        .totalDepositCost(0)
+        .totalExpenditureCost(0)
+        .build();
+  }
 }

@@ -2,6 +2,7 @@ package com.personal.smartbudgetcraft.domain.member.dto.request;
 
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
 import com.personal.smartbudgetcraft.domain.member.entity.Role;
+import com.personal.smartbudgetcraft.domain.member.entity.budgettracking.BudgetTracking;
 import com.personal.smartbudgetcraft.global.error.BusinessException;
 import com.personal.smartbudgetcraft.global.error.ErrorCode;
 import jakarta.validation.constraints.NotNull;
@@ -70,6 +71,7 @@ public class MemberSignUpReqDto {
         .account(this.account)
         .password(passwordEncoder.encode(this.password))
         .role(Role.USER)
+        .budgetTracking(BudgetTracking.resetBudget())
         .build();
   }
 }
