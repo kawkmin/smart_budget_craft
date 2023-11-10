@@ -46,6 +46,8 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     // 시큐리티 테스트 설치
     testImplementation 'org.springframework.security:spring-security-test'
+    // 테스트용 DB `H2` 설치
+    testImplementation 'com.h2database:h2'
 }
 
 tasks.named('test') {
