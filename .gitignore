@@ -35,3 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Rest Docs ###
+/src/main/resources/static/*.html
+!/src/main/resources/static/index.html
