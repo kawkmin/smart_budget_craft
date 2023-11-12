@@ -1,5 +1,6 @@
 package com.personal.smartbudgetcraft.global.config.security;
 
+import com.personal.smartbudgetcraft.global.config.redis.dao.RedisRepository;
 import com.personal.smartbudgetcraft.global.config.security.data.TokenDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -10,6 +11,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -37,15 +39,19 @@ public class TokenProvider {
   private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;            // 30분
   private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
   private final Key key; // 시큐리티 키
+  private final RedisRepository redisRepository;
+
 
   /**
    * properties 시큐리티 키를 이용하여,암호화 키 생성
    *
-   * @param secretKey propertise 에서 관리 하는 키
+   * @param secretKey       propertise 에서 관리 하는 키
+   * @param redisRepository redisRepository 의존성 주입
    */
-  public TokenProvider(@Value("${jwt.secret}") String secretKey) {
+  public TokenProvider(@Value("${jwt.secret}") String secretKey, RedisRepository redisRepository) {
     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
     this.key = Keys.hmacShaKeyFor(keyBytes);
+    this.redisRepository = redisRepository;
   }
 
   /**
@@ -55,28 +61,22 @@ public class TokenProvider {
    * @return JWT 토큰 Dto
    */
   public TokenDto generateTokenDto(Authentication authentication, Long memberId) {
-    // 권한들 가져오기
-    String authorities = authentication.getAuthorities().stream()
-        .map(GrantedAuthority::getAuthority)
-        .collect(Collectors.joining(","));
-
     // Access 토큰 만료일
     long now = (new Date()).getTime();
     Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
 
     // Access Token 생성
-    String accessToken = Jwts.builder()
-        .setSubject(authentication.getName())       // payload "sub": "1" (ex)
-        .claim(AUTHORITIES_KEY, authorities)        // payload "auth": "ROLE_USER"
-        .setExpiration(accessTokenExpiresIn)        // payload "exp": 151621022 (ex)
-        .signWith(key, SignatureAlgorithm.HS512)    // header "alg": "HS512"
-        .compact();
+    String accessToken = createAccessToken(authentication, memberId);
 
     // Refresh Token 생성
     String refreshToken = Jwts.builder()
         .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
         .signWith(key, SignatureAlgorithm.HS512)
         .compact();
+
+    // Refresh Token DB 저장
+    redisRepository.setValues(String.valueOf(memberId), refreshToken,
+        Duration.ofMillis(REFRESH_TOKEN_EXPIRE_TIME));
 
     // 토큰 Dto 생성
     return TokenDto.builder()
@@ -85,6 +85,28 @@ public class TokenProvider {
         .refreshToken(refreshToken)
         .accessTokenExpiresIn(accessTokenExpiresIn.getTime())
         .build();
+  }
+
+  /**
+   * AccessToken 생성
+   */
+  public String createAccessToken(Authentication authentication, Long memberId) {
+    // 권한 가져오기
+    String authorities = authentication.getAuthorities().stream()
+        .map(GrantedAuthority::getAuthority)
+        .collect(Collectors.joining(","));
+
+    // Access 토큰 만료일
+    long now = (new Date()).getTime();
+    Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
+
+    String accessToken = Jwts.builder()
+        .setSubject(String.valueOf(memberId))       // payload "sub": "1" (ex)
+        .claim(AUTHORITIES_KEY, authorities)        // payload "auth": "ROLE_USER"
+        .setExpiration(accessTokenExpiresIn)        // payload "exp": 151621022 (ex)
+        .signWith(key, SignatureAlgorithm.HS512)    // header "alg": "HS512"
+        .compact();
+    return accessToken;
   }
 
   /**
