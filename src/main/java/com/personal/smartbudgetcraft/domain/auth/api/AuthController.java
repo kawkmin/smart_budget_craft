@@ -4,7 +4,12 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 import com.personal.smartbudgetcraft.domain.auth.application.AuthService;
+import com.personal.smartbudgetcraft.domain.member.dto.request.MemberLoginReqDto;
 import com.personal.smartbudgetcraft.domain.member.dto.request.MemberSignUpReqDto;
+import com.personal.smartbudgetcraft.domain.member.entity.Member;
+import com.personal.smartbudgetcraft.global.config.security.annotation.LoginMember;
+import com.personal.smartbudgetcraft.global.config.security.data.TokenDto;
+import com.personal.smartbudgetcraft.global.config.security.data.TokenReqDto;
 import com.personal.smartbudgetcraft.global.dto.response.ApiResDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -57,4 +62,51 @@ public class AuthController {
         .body(ApiResDto.toSuccessForm(""));
   }
 
+  /**
+   * 로그인 및 토큰 발급
+   *
+   * @param reqDto 로그인 입력 데이터
+   * @return 200, JWT 토큰
+   */
+  @PostMapping("/login")
+  public ResponseEntity<ApiResDto> login(
+      @RequestBody MemberLoginReqDto reqDto
+  ) {
+    TokenDto jwtToken = authService.login(reqDto);
+    
+    return ResponseEntity.ok(ApiResDto.toSuccessForm(jwtToken));
+  }
+
+  /**
+   * Access Token 재발급
+   *
+   * @param member 토큰의 회원
+   * @param reqDto 기존 토큰 데이터 정보
+   * @return 200, 재발급 된 JWT 토큰
+   */
+  @PostMapping("/reissue")
+  public ResponseEntity<ApiResDto> reissue(
+      @LoginMember Member member,
+      @RequestBody TokenReqDto reqDto
+  ) {
+    TokenDto jwtToken = authService.reissue(member, reqDto);
+
+    return ResponseEntity.ok(ApiResDto.toSuccessForm(jwtToken));
+  }
+
+  /**
+   * 로그아웃 및 토큰 삭제
+   *
+   * @param member 로그인된 회원
+   * @return 204, 토큰 삭제
+   */
+  @PostMapping("/logout")
+  public ResponseEntity<ApiResDto> logout(
+      @LoginMember Member member
+  ) {
+    authService.logout(member);
+
+    return ResponseEntity.status(NO_CONTENT)
+        .body(ApiResDto.toSuccessForm(""));
+  }
 }
