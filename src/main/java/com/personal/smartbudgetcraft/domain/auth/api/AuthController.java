@@ -8,6 +8,7 @@ import com.personal.smartbudgetcraft.domain.member.dto.request.MemberLoginReqDto
 import com.personal.smartbudgetcraft.domain.member.dto.request.MemberSignUpReqDto;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
 import com.personal.smartbudgetcraft.global.config.security.annotation.LoginMember;
+import com.personal.smartbudgetcraft.global.config.security.data.TokenDto;
 import com.personal.smartbudgetcraft.global.config.security.data.TokenReqDto;
 import com.personal.smartbudgetcraft.global.dto.response.ApiResDto;
 import jakarta.validation.Valid;
@@ -71,7 +72,9 @@ public class AuthController {
   public ResponseEntity<ApiResDto> login(
       @RequestBody MemberLoginReqDto reqDto
   ) {
-    return ResponseEntity.ok(ApiResDto.toSuccessForm(authService.login(reqDto)));
+    TokenDto jwtToken = authService.login(reqDto);
+    
+    return ResponseEntity.ok(ApiResDto.toSuccessForm(jwtToken));
   }
 
   /**
@@ -86,7 +89,9 @@ public class AuthController {
       @LoginMember Member member,
       @RequestBody TokenReqDto reqDto
   ) {
-    return ResponseEntity.ok(ApiResDto.toSuccessForm(authService.reissue(member, reqDto)));
+    TokenDto jwtToken = authService.reissue(member, reqDto);
+
+    return ResponseEntity.ok(ApiResDto.toSuccessForm(jwtToken));
   }
 
   /**
@@ -100,6 +105,8 @@ public class AuthController {
       @LoginMember Member member
   ) {
     authService.logout(member);
-    return ResponseEntity.ok(ApiResDto.toSuccessForm(""));
+
+    return ResponseEntity.status(NO_CONTENT)
+        .body(ApiResDto.toSuccessForm(""));
   }
 }
