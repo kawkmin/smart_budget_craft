@@ -1,6 +1,5 @@
 package com.personal.smartbudgetcraft.global.config.security;
 
-import com.personal.smartbudgetcraft.global.config.redis.dao.RedisRepository;
 import com.personal.smartbudgetcraft.global.config.security.data.TokenDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -11,7 +10,6 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -36,22 +34,19 @@ public class TokenProvider {
 
   private static final String AUTHORITIES_KEY = "auth";
   private static final String BEARER_TYPE = "Bearer";
-  private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;            // 30분
-  private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
+  public static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;            // 30분
+  public static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
   private final Key key; // 시큐리티 키
-  private final RedisRepository redisRepository;
 
 
   /**
    * properties 시큐리티 키를 이용하여,암호화 키 생성
    *
-   * @param secretKey       propertise 에서 관리 하는 키
-   * @param redisRepository redisRepository 의존성 주입
+   * @param secretKey propertise 에서 관리 하는 키
    */
-  public TokenProvider(@Value("${jwt.secret}") String secretKey, RedisRepository redisRepository) {
+  public TokenProvider(@Value("${jwt.secret}") String secretKey) {
     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
     this.key = Keys.hmacShaKeyFor(keyBytes);
-    this.redisRepository = redisRepository;
   }
 
   /**
@@ -73,10 +68,6 @@ public class TokenProvider {
         .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
         .signWith(key, SignatureAlgorithm.HS512)
         .compact();
-
-    // Refresh Token DB 저장
-    redisRepository.setValues(String.valueOf(memberId), refreshToken,
-        Duration.ofMillis(REFRESH_TOKEN_EXPIRE_TIME));
 
     // 토큰 Dto 생성
     return TokenDto.builder()
@@ -179,16 +170,18 @@ public class TokenProvider {
    * @param token 토큰
    * @return 찾은 회원 ID
    */
-  public String getIdFromToken(String token) {
+  public Long getIdFromToken(String token) {
     if (token.startsWith("Bearer ")) {
       token = token.substring(BEARER_TYPE.length() + 1);
     }
 
-    return String.valueOf(Jwts.parserBuilder()
-        .setSigningKey(key)
-        .build()
-        .parseClaimsJws(token)
-        .getBody()
-        .getSubject());
+    return Long.valueOf(
+        String.valueOf(Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .getSubject())
+    );
   }
 }

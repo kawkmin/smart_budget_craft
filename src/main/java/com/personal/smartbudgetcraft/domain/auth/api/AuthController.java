@@ -6,6 +6,9 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import com.personal.smartbudgetcraft.domain.auth.application.AuthService;
 import com.personal.smartbudgetcraft.domain.member.dto.request.MemberLoginReqDto;
 import com.personal.smartbudgetcraft.domain.member.dto.request.MemberSignUpReqDto;
+import com.personal.smartbudgetcraft.domain.member.entity.Member;
+import com.personal.smartbudgetcraft.global.config.security.annotation.LoginMember;
+import com.personal.smartbudgetcraft.global.config.security.data.TokenReqDto;
 import com.personal.smartbudgetcraft.global.dto.response.ApiResDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -69,6 +72,21 @@ public class AuthController {
       @RequestBody MemberLoginReqDto reqDto
   ) {
     return ResponseEntity.ok(ApiResDto.toSuccessForm(authService.login(reqDto)));
+  }
+
+  /**
+   * Access Token 재발급
+   *
+   * @param member 토큰의 회원
+   * @param reqDto 기존 토큰 데이터 정보
+   * @return 200, 재발급 된 JWT 토큰
+   */
+  @PostMapping("/reissue")
+  public ResponseEntity<ApiResDto> reissue(
+      @LoginMember Member member,
+      @RequestBody TokenReqDto reqDto
+  ) {
+    return ResponseEntity.ok(ApiResDto.toSuccessForm(authService.reissue(member, reqDto)));
   }
 
 }
