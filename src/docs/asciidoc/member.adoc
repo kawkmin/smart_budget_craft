@@ -41,5 +41,59 @@ include::{snippets}/signup/중복된_계정명을_가진_회원이_없으면_중
 - 400
 
 중복된 계정명이 있을 때
+
 include::{snippets}/signup/중복된_계정명을_가진_회원이_있으면_중복_확인에_실패한다/http-response.adoc[]
 
+=== 로그인
+
+Request
+
+include::{snippets}/login/아이디_비밀번호가_일치하면_토큰_반환이_성공한다/http-request.adoc[]
+
+Response
+
+- 200
+
+include::{snippets}/login/아이디_비밀번호가_일치하면_토큰_반환이_성공한다/http-response.adoc[]
+
+- 400
+
+비밀번호가 일치하지 않을 때
+
+include::{snippets}/login/비밀번호가_일치하지_않으면_토큰_반환이_실패한다/http-response.adoc[]
+
+- 404
+
+아이디가 일치하지 않을 때
+
+include::{snippets}/login/아이디가_존재하지_않으면_토큰_반환이_실패한다/http-response.adoc[]
+
+=== 로그아웃
+
+Request
+
+include::{snippets}/logout/정상적으로_로그아웃에_성공한다/http-request.adoc[]
+
+Response
+
+- 204
+
+include::{snippets}/logout/정상적으로_로그아웃에_성공한다/http-response.adoc[]
+
+=== 토큰 재발급
+
+Request
+
+include::{snippets}/reissue/refresh_토큰이_올바를_때_재발급에_성공한다/http-request.adoc[]
+
+Request
+
+- 200
+
+include::{snippets}/reissue/refresh_토큰이_올바를_때_재발급에_성공한다/http-response.adoc[]
+
+- 400
+
+Refresh 토큰이 없거나 맞지 않을 때
+
+include::{snippets}/reissue/올바르지_않은_토큰일_경우_토큰_재발급에_실패한다/http-response.adoc[]
