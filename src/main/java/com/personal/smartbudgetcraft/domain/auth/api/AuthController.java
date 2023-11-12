@@ -4,6 +4,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 import com.personal.smartbudgetcraft.domain.auth.application.AuthService;
+import com.personal.smartbudgetcraft.domain.member.dto.request.MemberLoginReqDto;
 import com.personal.smartbudgetcraft.domain.member.dto.request.MemberSignUpReqDto;
 import com.personal.smartbudgetcraft.global.dto.response.ApiResDto;
 import jakarta.validation.Valid;
@@ -55,6 +56,19 @@ public class AuthController {
 
     return ResponseEntity.status(NO_CONTENT)
         .body(ApiResDto.toSuccessForm(""));
+  }
+
+  /**
+   * 로그인 및 토큰 발급
+   *
+   * @param reqDto 로그인 입력 데이터
+   * @return 200, JWT 토큰
+   */
+  @PostMapping("/login")
+  public ResponseEntity<ApiResDto> login(
+      @RequestBody MemberLoginReqDto reqDto
+  ) {
+    return ResponseEntity.ok(ApiResDto.toSuccessForm(authService.login(reqDto)));
   }
 
 }
