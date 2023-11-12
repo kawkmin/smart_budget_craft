@@ -103,7 +103,7 @@ public class AuthService {
    */
   @Transactional
   public TokenDto reissue(Member member, TokenReqDto tokenDto) {
-    
+
     // 1. Refresh Token 검증
     if (!tokenProvider.validateToken(tokenDto.getRefreshToken())) {
       throw new BusinessException(null, "token", ErrorCode.REFRESH_TOKEN_BAD_REQUEST);
@@ -130,4 +130,12 @@ public class AuthService {
         .build();
   }
 
+  /**
+   * 로그아웃 - Refresh Token 저장소 삭제
+   *
+   * @param member 로그인된 회원
+   */
+  public void logout(Member member) {
+    redisRepository.deleteValues(String.valueOf(member.getId()));
+  }
 }

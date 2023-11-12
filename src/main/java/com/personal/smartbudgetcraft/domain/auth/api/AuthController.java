@@ -89,4 +89,17 @@ public class AuthController {
     return ResponseEntity.ok(ApiResDto.toSuccessForm(authService.reissue(member, reqDto)));
   }
 
+  /**
+   * 로그아웃 및 토큰 삭제
+   *
+   * @param member 로그인된 회원
+   * @return 204, 토큰 삭제
+   */
+  @PostMapping("/logout")
+  public ResponseEntity<ApiResDto> logout(
+      @LoginMember Member member
+  ) {
+    authService.logout(member);
+    return ResponseEntity.ok(ApiResDto.toSuccessForm(""));
+  }
 }
