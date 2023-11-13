@@ -3,6 +3,7 @@ package com.personal.smartbudgetcraft.domain.deposit.dto.request;
 import com.personal.smartbudgetcraft.domain.category.cost.entity.CostCategory;
 import com.personal.smartbudgetcraft.domain.deposit.entity.Deposit;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
+import com.personal.smartbudgetcraft.global.config.valid.annotation.MoneyUnit;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -27,6 +28,7 @@ public class DepositCreateReqDto {
   // 예산 금액
   @NotNull(message = "금액을 입력해주세요.")
   @Positive(message = "양수만 입력이 가능합니다.")
+  @MoneyUnit(message = "100원 단위로 입력해주세요.")
   @Max(value = Integer.MAX_VALUE - 1, message = "올바른 금액을 입력해주세요.")
   private Integer cost;
 
