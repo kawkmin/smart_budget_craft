@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -45,4 +46,21 @@ public class Deposit {
   // 예산 금액
   @Column(name = "cost", nullable = false)
   private Integer cost;
+
+  @Builder
+  public Deposit(Long id, CostCategory category, Member member, Integer cost) {
+    this.id = id;
+    this.category = category;
+    this.member = member;
+    this.cost = cost;
+  }
+
+  /**
+   * 금액을 추가
+   *
+   * @param cost 추가할 금액
+   */
+  public void addCost(Integer cost) {
+    this.cost += cost;
+  }
 }

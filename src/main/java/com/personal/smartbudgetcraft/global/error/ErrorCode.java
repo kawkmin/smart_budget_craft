@@ -8,12 +8,16 @@ import org.springframework.http.HttpStatus;
  */
 @Getter
 public enum ErrorCode {
+
   // Member
   MEMBER_WRONG_PASSWORD_CONFIRM("비밀번호가 서로 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
   MEMBER_ACCOUNT_DUPLICATE("중복된 아이디 입니다.", HttpStatus.BAD_REQUEST),
   MEMBER_ACCOUNT_NOT_FOUND("아이디를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
   MEMBER_PASSWORD_BAD_REQUEST("비밀번호가 틀렸습니다.", HttpStatus.BAD_REQUEST),
   MEMBER_NOT_FOUND("존재하지 않은 회원입니다", HttpStatus.NOT_FOUND),
+
+  // Cost Cateogry
+  COST_CATEGORY_NOT_FOUND("존재하지 않은 카테고리입니다.", HttpStatus.NOT_FOUND),
 
   // Security
   ACCESS_DENIED_EXCEPTION("필요한 접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
