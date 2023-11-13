@@ -5,6 +5,7 @@ import com.personal.smartbudgetcraft.domain.category.cost.entity.CostCategory;
 import com.personal.smartbudgetcraft.domain.deposit.dao.DepositRepository;
 import com.personal.smartbudgetcraft.domain.deposit.dto.request.DepositCreateReqDto;
 import com.personal.smartbudgetcraft.domain.deposit.entity.Deposit;
+import com.personal.smartbudgetcraft.domain.member.dao.MemberRepository;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
 import com.personal.smartbudgetcraft.global.error.BusinessException;
 import com.personal.smartbudgetcraft.global.error.ErrorCode;
@@ -20,6 +21,7 @@ public class DepositService {
 
   private final DepositRepository depositRepository;
   private final CostCategoryRepository categoryRepository;
+  private final MemberRepository memberRepository;
 
   /**
    * 예산 설정
@@ -31,16 +33,19 @@ public class DepositService {
    */
   @Transactional
   public Long writeDeposit(Member member, DepositCreateReqDto reqDto) {
-    // 카테고리 찾기
-    CostCategory category = getCategoryById(reqDto.getCategoryId());
+    // 이전 카테고리에 대한 예산 optional
+    Optional<Deposit> optionalPrevDeposit = member.getDeposits().stream()
+        .filter(deposit -> deposit.getCategory().getId().equals(reqDto.getCategoryId()))
+        .findFirst();
 
     // 이전의 카테고리에 대한 금액이 있을 때, 업데이트 로직 수행
-    Optional<Deposit> optionalDeposit = depositRepository.findByCategory(category);
-    if (optionalDeposit.isPresent()) {
-      return updateDepositCost(reqDto.getCost(), optionalDeposit.get());
+    if (optionalPrevDeposit.isPresent()) {
+      return updateDepositCost(reqDto.getCost(), optionalPrevDeposit.get());
     }
 
     // 이전의 카테고리에 대한 금액이 없을 때
+    // 카테고리 찾기
+    CostCategory category = getCategoryById(reqDto.getCategoryId());
     // dto를 Entity로 변경
     Deposit deposit = reqDto.toEntity(member, category);
 
