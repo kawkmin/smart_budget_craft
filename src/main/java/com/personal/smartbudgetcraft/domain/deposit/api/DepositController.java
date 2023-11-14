@@ -44,6 +44,9 @@ public class DepositController {
 
   /**
    * 예산 설계 추천 시스템
+   *
+   * @param reqDto 예산 추천에 필요한 데이터 정보
+   * @return 200, 추천된 예산 정보
    */
   @GetMapping("/recommend")
   public ResponseEntity<ApiResDto> recommendDeposit(
