@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,4 +38,10 @@ public class CostCategory {
   // 예산 (N:1)
   @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
   private List<Deposit> deposits = new ArrayList<>();
+
+  @Builder
+  public CostCategory(Long id, String name) {
+    this.id = id;
+    this.name = name;
+  }
 }
