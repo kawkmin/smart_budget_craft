@@ -3,6 +3,7 @@ package com.personal.smartbudgetcraft.domain.deposit.entity;
 import static jakarta.persistence.FetchType.LAZY;
 
 import com.personal.smartbudgetcraft.domain.category.cost.entity.CostCategory;
+import com.personal.smartbudgetcraft.domain.deposit.dto.request.DepositCreateReqDto;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -61,5 +62,16 @@ public class Deposit {
    */
   public void addCost(Integer cost) {
     this.cost += cost;
+  }
+
+  /**
+   * 예산 수정
+   *
+   * @param reqDto   수정할 데이터 정보
+   * @param category 수정할 카테고리
+   */
+  public void update(DepositCreateReqDto reqDto, CostCategory category) {
+    this.cost = reqDto.getCost();
+    this.category = category;
   }
 }
