@@ -3,6 +3,7 @@ package com.personal.smartbudgetcraft.domain.expenditure.entity;
 import static jakarta.persistence.FetchType.LAZY;
 
 import com.personal.smartbudgetcraft.domain.category.cost.entity.CostCategory;
+import com.personal.smartbudgetcraft.domain.expenditure.dto.request.ExpenditureWriteReqDto;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -69,5 +70,19 @@ public class Expenditure {
     this.memo = memo;
     this.isExcluded = isExcluded;
     this.time = time;
+  }
+
+  /**
+   * 입력 정보로 지출 수정
+   *
+   * @param reqDto   입력 데이터 정보
+   * @param category 지출 카테고리
+   */
+  public void update(ExpenditureWriteReqDto reqDto, CostCategory category) {
+    this.category = category;
+    this.cost = reqDto.getCost();
+    this.memo = reqDto.getMemo();
+    this.isExcluded = reqDto.getIsExcluded();
+    this.time = reqDto.getTime();
   }
 }

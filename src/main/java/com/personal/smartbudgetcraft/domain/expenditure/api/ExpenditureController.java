@@ -9,7 +9,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +39,26 @@ public class ExpenditureController {
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(ApiResDto.toSuccessForm(wroteExpenditureId));
+  }
+
+  /**
+   * 지출 수정
+   *
+   * @param member        회원
+   * @param expenditureId 수정할 지출 id
+   * @param reqDto        수정할 지출 데이터 정보
+   * @return 201, 수정된 지출 id
+   */
+  @PutMapping("/{expenditureId}")
+  public ResponseEntity<ApiResDto> updateExpenditure(
+      @LoginMember Member member,
+      @PathVariable(name = "expenditureId") Long expenditureId,
+      @Valid @RequestBody ExpenditureWriteReqDto reqDto
+  ) {
+    Long updatedExpenditureId = expenditureService.updateExpenditure(member, expenditureId, reqDto);
+
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(ApiResDto.toSuccessForm(updatedExpenditureId));
   }
 
 }

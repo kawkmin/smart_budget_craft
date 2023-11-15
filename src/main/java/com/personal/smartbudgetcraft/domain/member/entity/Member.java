@@ -6,6 +6,7 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 import com.personal.smartbudgetcraft.domain.deposit.entity.Deposit;
+import com.personal.smartbudgetcraft.domain.expenditure.entity.Expenditure;
 import com.personal.smartbudgetcraft.domain.member.entity.budgettracking.BudgetTracking;
 import com.personal.smartbudgetcraft.global.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -64,6 +65,10 @@ public class Member extends BaseEntity {
   // 예산 (1:N)
   @OneToMany(fetch = LAZY, mappedBy = "member")
   private List<Deposit> deposits = new ArrayList<>();
+
+  // 지출 (1:N)
+  @OneToMany(fetch = LAZY, mappedBy = "member")
+  private List<Expenditure> expenditures = new ArrayList<>();
 
   @Builder
   public Member(Long id, BudgetTracking budgetTracking, String account, String password, Role role,

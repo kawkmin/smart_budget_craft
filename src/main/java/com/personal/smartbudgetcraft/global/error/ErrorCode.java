@@ -30,8 +30,11 @@ public enum ErrorCode {
   COST_CATEGORY_NOT_FOUND("존재하지 않은 카테고리입니다.", HttpStatus.NOT_FOUND),
 
   // Deposit
-  DEPOSIT_NOT_FOUND("존재하지 않은 예산입니다.", HttpStatus.NOT_FOUND);
+  DEPOSIT_NOT_FOUND("존재하지 않은 예산입니다.", HttpStatus.NOT_FOUND),
 
+  // Expenditure
+  EXPENDITURE_NOT_FOUND("존재하지 않은 지출입니다.", HttpStatus.NOT_FOUND);
+  
 
   //오류 메시지
   private final String message;
