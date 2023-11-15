@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -57,4 +58,16 @@ public class Expenditure {
   // 지출 시간
   @Column(name = "time", nullable = false)
   private LocalDateTime time;
+
+  @Builder
+  public Expenditure(Long id, CostCategory category, Member member, Integer cost, String memo,
+      Boolean isExcluded, LocalDateTime time) {
+    this.id = id;
+    this.category = category;
+    this.member = member;
+    this.cost = cost;
+    this.memo = memo;
+    this.isExcluded = isExcluded;
+    this.time = time;
+  }
 }
