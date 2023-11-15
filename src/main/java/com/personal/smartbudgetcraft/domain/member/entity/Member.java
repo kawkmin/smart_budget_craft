@@ -5,6 +5,7 @@ import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
+import com.personal.smartbudgetcraft.domain.deposit.entity.Deposit;
 import com.personal.smartbudgetcraft.domain.member.entity.budgettracking.BudgetTracking;
 import com.personal.smartbudgetcraft.global.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -13,8 +14,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -57,13 +61,18 @@ public class Member extends BaseEntity {
   @Column(name = "role", nullable = false)
   private Role role;
 
+  // 예산 (1:N)
+  @OneToMany(fetch = LAZY, mappedBy = "member")
+  private List<Deposit> deposits = new ArrayList<>();
+
   @Builder
-  public Member(Long id, String account, String password, Role role,
-      BudgetTracking budgetTracking) {
+  public Member(Long id, BudgetTracking budgetTracking, String account, String password, Role role,
+      List<Deposit> deposits) {
     this.id = id;
     this.budgetTracking = budgetTracking;
     this.account = account;
     this.password = password;
     this.role = role;
+    this.deposits = deposits;
   }
 }

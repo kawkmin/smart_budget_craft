@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.personal.smartbudgetcraft.config.restdocs.AbstractRestDocsTests;
 import com.personal.smartbudgetcraft.domain.auth.application.AuthService;
 import com.personal.smartbudgetcraft.domain.member.BudgetTrackingTestHelper;
@@ -25,7 +24,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
@@ -37,8 +35,6 @@ class AuthControllerTest extends AbstractRestDocsTests {
 
   private static final String AUTH_URL = "/api/v1/auth";
 
-  @Autowired
-  private final ObjectMapper objectMapper = new ObjectMapper();
 
   @MockBean
   private AuthService authService;

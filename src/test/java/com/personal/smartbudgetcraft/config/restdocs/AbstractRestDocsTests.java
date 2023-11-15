@@ -2,6 +2,7 @@ package com.personal.smartbudgetcraft.config.restdocs;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.personal.smartbudgetcraft.global.config.security.annotation.LoginMemberArgumentResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,9 +27,10 @@ public abstract class AbstractRestDocsTests {
 
   @Autowired
   protected RestDocumentationResultHandler restDocs;
-
   @Autowired
   protected MockMvc mockMvc;
+  @Autowired
+  protected final ObjectMapper objectMapper = new ObjectMapper();
 
   @MockBean
   protected LoginMemberArgumentResolver loginMemberArgumentResolver; // @LoginMember 어노테이션을 위해
