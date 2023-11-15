@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.personal.smartbudgetcraft.config.restdocs.AbstractRestDocsTests;
@@ -146,6 +147,107 @@ class DepositControllerTest extends AbstractRestDocsTests {
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(reqDto)))
           .andExpect(status().isBadRequest());
+    }
+  }
+
+  @Nested
+  @DisplayName("예산 수정 관련 컨트롤러 테스트")
+  class updateDeposit {
+
+    @Test
+    @DisplayName("예산 수정이 정상적으로 성공한다.")
+    void 예산_수정이_정상적으로_성공한다() throws Exception {
+      int normalCost = 10000; // 정상 값
+
+      DepositCreateReqDto reqDto = DepositCreateReqDto.builder()
+          .categoryId(1L)
+          .cost(normalCost)
+          .build();
+
+      given(depositService.updateDeposit(any(), any(), any())).willReturn(1L);
+
+      mockMvc.perform(put(DEPOSIT_URL + "/1")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(reqDto)))
+          .andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("예산 돈이 100원 단위가 아닐때, 예산 수정에 실패한다.")
+    void 예산_돈이_100원_단위가_아닐때_예산_수정에_실패한다_400() throws Exception {
+      int abnormalCost = 109; // 비정상 값
+
+      DepositCreateReqDto reqDto = DepositCreateReqDto.builder()
+          .categoryId(1L)
+          .cost(abnormalCost)
+          .build();
+
+      given(depositService.updateDeposit(any(), any(), any())).willReturn(1L);
+
+      mockMvc.perform(put(DEPOSIT_URL + "/1")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(reqDto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("카테고리가 없으면, 예산 수정에 실패한다.")
+    void 카테고리가_없으면_예산_수정에_실패한다_404() throws Exception {
+      int normalCost = 10000; // 정상 값
+
+      DepositCreateReqDto reqDto = DepositCreateReqDto.builder()
+          .categoryId(1L)
+          .cost(normalCost)
+          .build();
+
+      given(depositService.updateDeposit(any(), any(), any())).willThrow(
+          new BusinessException(55L, "categoryId", ErrorCode.COST_CATEGORY_NOT_FOUND)
+      );
+
+      mockMvc.perform(put(DEPOSIT_URL + "/1")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(reqDto)))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("회원이 작성하지 않은 예산을 수정하면, 실패한다.")
+    void 회원이_작성하지_않은_예산을_수정하면_실패한다() throws Exception {
+      int normalCost = 10000; // 정상 값
+
+      DepositCreateReqDto reqDto = DepositCreateReqDto.builder()
+          .categoryId(1L)
+          .cost(normalCost)
+          .build();
+
+      given(depositService.updateDeposit(any(), any(), any())).willThrow(
+          new BusinessException(43, "depositId", ErrorCode.ACCESS_DENIED_EXCEPTION)
+      );
+
+      mockMvc.perform(put(DEPOSIT_URL + "/1")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(reqDto)))
+          .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("예산을 찾을 수 없으면, 예산 수정에 실패한다.")
+    void 예산을_찾을_수_없으면_예산_수정에_실패한다() throws Exception {
+      int normalCost = 10000; // 정상 값
+
+      DepositCreateReqDto reqDto = DepositCreateReqDto.builder()
+          .categoryId(1L)
+          .cost(normalCost)
+          .build();
+
+      given(depositService.updateDeposit(any(), any(), any())).willThrow(
+          new BusinessException(12L, "depositId", ErrorCode.DEPOSIT_NOT_FOUND)
+      );
+
+      mockMvc.perform(put(DEPOSIT_URL + "/1")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(reqDto)))
+          .andExpect(status().isNotFound());
     }
   }
 }
