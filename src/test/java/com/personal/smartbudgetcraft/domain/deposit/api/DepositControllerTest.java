@@ -2,6 +2,8 @@ package com.personal.smartbudgetcraft.domain.deposit.api;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -156,7 +158,7 @@ class DepositControllerTest extends AbstractRestDocsTests {
 
     @Test
     @DisplayName("예산 수정이 정상적으로 성공한다.")
-    void 예산_수정이_정상적으로_성공한다() throws Exception {
+    void 예산_수정이_정상적으로_성공한다_201() throws Exception {
       int normalCost = 10000; // 정상 값
 
       DepositCreateReqDto reqDto = DepositCreateReqDto.builder()
@@ -212,7 +214,7 @@ class DepositControllerTest extends AbstractRestDocsTests {
 
     @Test
     @DisplayName("회원이 작성하지 않은 예산을 수정하면, 실패한다.")
-    void 회원이_작성하지_않은_예산을_수정하면_실패한다() throws Exception {
+    void 회원이_작성하지_않은_예산을_수정하면_실패한다_403() throws Exception {
       int normalCost = 10000; // 정상 값
 
       DepositCreateReqDto reqDto = DepositCreateReqDto.builder()
@@ -232,7 +234,7 @@ class DepositControllerTest extends AbstractRestDocsTests {
 
     @Test
     @DisplayName("예산을 찾을 수 없으면, 예산 수정에 실패한다.")
-    void 예산을_찾을_수_없으면_예산_수정에_실패한다() throws Exception {
+    void 예산을_찾을_수_없으면_예산_수정에_실패한다_404() throws Exception {
       int normalCost = 10000; // 정상 값
 
       DepositCreateReqDto reqDto = DepositCreateReqDto.builder()
@@ -248,6 +250,30 @@ class DepositControllerTest extends AbstractRestDocsTests {
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(reqDto)))
           .andExpect(status().isNotFound());
+    }
+  }
+
+  @Nested
+  @DisplayName("예산 삭제 관련 컨트롤러 테스트")
+  class deleteDeposit {
+
+    @Test
+    @DisplayName("정상적으로 예산 삭제에 성공한다.")
+    void 정상적으로_예산_삭제에_성공한다_204() throws Exception {
+      mockMvc.perform(delete(DEPOSIT_URL + "/1"))
+          .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("회원이 작성하지 않은 예산을 수정하면, 실패한다.")
+    void 회원이_작성하지_않은_예산을_수정하면_실패한다_403() throws Exception {
+
+      doThrow(new BusinessException(43, "depositId", ErrorCode.ACCESS_DENIED_EXCEPTION))
+          .when(depositService)
+          .deleteDeposit(any(), any());
+
+      mockMvc.perform(delete(DEPOSIT_URL + "/1"))
+          .andExpect(status().isForbidden());
     }
   }
 }
