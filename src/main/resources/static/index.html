@@ -462,8 +462,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#_예산">예산</a>
 <ul class="sectlevel2">
-<li><a href="#_예산_설정">예산 설정</a></li>
+<li><a href="#_예산_작성">예산 작성</a></li>
 <li><a href="#_예산_추천_시스템">예산 추천 시스템</a></li>
+<li><a href="#_예산_수정">예산 수정</a></li>
+<li><a href="#_예산_삭제">예산 삭제</a></li>
 </ul>
 </li>
 </ul>
@@ -924,7 +926,7 @@ Content-Length: 125
 <h2 id="_예산">예산</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_예산_설정">예산 설정</h3>
+<h3 id="_예산_작성">예산 작성</h3>
 <div class="paragraph">
 <p>Request</p>
 </div>
@@ -1073,6 +1075,182 @@ Content-Length: 114
 {
   "status" : "error",
   "message" : "[140040] cost: 100원 단위로 입력해주세요.",
+  "data" : null
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_예산_수정">예산 수정</h3>
+<div class="paragraph">
+<p>Request</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PUT /api/v1/deposit/1 HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Content-Length: 43
+Host: localhost:8080
+
+{
+  "categoryId" : 1,
+  "cost" : 10000
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Response</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>201</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>HTTP/1.1 201 Created
+Content-Type: application/json;charset=UTF-8
+Content-Length: 64
+
+{
+  "status" : "success",
+  "message" : null,
+  "data" : 1
+}</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>400</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>HTTP/1.1 400 Bad Request
+Content-Type: application/json;charset=UTF-8
+Content-Length: 111
+
+{
+  "status" : "error",
+  "message" : "[109] cost: 100원 단위로 입력해주세요.",
+  "data" : null
+}</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>403 (회원의 수정 권한이 없을 때)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>HTTP/1.1 403 Forbidden
+Content-Type: application/json;charset=UTF-8
+Content-Length: 119
+
+{
+  "status" : "error",
+  "message" : "[43] depositId: 필요한 접근 권한이 없습니다.",
+  "data" : null
+}</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>404</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>(예산을 찾을 수 없을 때)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 404 Not Found
+Content-Type: application/json;charset=UTF-8
+Content-Length: 115
+
+{
+  "status" : "error",
+  "message" : "[12] depositId: 존재하지 않은 예산입니다.",
+  "data" : null
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>(카테고리를 찾을 수 없을 때)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 404 Not Found
+Content-Type: application/json;charset=UTF-8
+Content-Length: 122
+
+{
+  "status" : "error",
+  "message" : "[55] categoryId: 존재하지 않은 카테고리입니다.",
+  "data" : null
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_예산_삭제">예산 삭제</h3>
+<div class="paragraph">
+<p>Request</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /api/v1/deposit/1 HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Response</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>204</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>HTTP/1.1 204 No Content
+Content-Type: application/json;charset=UTF-8
+Content-Length: 65
+
+{
+  "status" : "success",
+  "message" : null,
+  "data" : ""
+}</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>403 (회원이 삭제 권한이 없을 때)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>HTTP/1.1 403 Forbidden
+Content-Type: application/json;charset=UTF-8
+Content-Length: 119
+
+{
+  "status" : "error",
+  "message" : "[43] depositId: 필요한 접근 권한이 없습니다.",
   "data" : null
 }</pre>
 </div>

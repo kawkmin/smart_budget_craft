@@ -1,6 +1,6 @@
 == 예산
 
-=== 예산 설정
+=== 예산 작성
 
 Request
 
@@ -30,3 +30,44 @@ include::{snippets}/recommend-deposit/정상적으로_입력될_때_예산_추�
 
 - 400 (예산 추천 돈이 100원 단위가 아닐 때)
 include::{snippets}/recommend-deposit/예산_돈이_100원_단위가_아닐때_예산_추천에_실패한다_400/http-response.adoc[]
+
+=== 예산 수정
+
+Request
+
+include::{snippets}/update-deposit/예산_수정이_정상적으로_성공한다_201/http-request.adoc[]
+
+Response
+
+- 201
+include::{snippets}/update-deposit/예산_수정이_정상적으로_성공한다_201/http-response.adoc[]
+
+- 400
+include::{snippets}/update-deposit/예산_돈이_100원_단위가_아닐때_예산_수정에_실패한다_400/http-response.adoc[]
+
+- 403 (회원의 수정 권한이 없을 때)
+include::{snippets}/update-deposit/회원이_작성하지_않은_예산을_수정하면_실패한다_403/http-response.adoc[]
+
+- 404
+
+(예산을 찾을 수 없을 때)
+
+include::{snippets}/update-deposit/예산을_찾을_수_없으면_예산_수정에_실패한다_404/http-response.adoc[]
+
+(카테고리를 찾을 수 없을 때)
+
+include::{snippets}/update-deposit/카테고리가_없으면_예산_수정에_실패한다_404/http-response.adoc[]
+
+=== 예산 삭제
+
+Request
+
+include::{snippets}/delete-deposit/정상적으로_예산_삭제에_성공한다_204/http-request.adoc[]
+
+Response
+
+- 204
+include::{snippets}/delete-deposit/정상적으로_예산_삭제에_성공한다_204/http-response.adoc[]
+
+- 403 (회원이 삭제 권한이 없을 때)
+include::{snippets}/delete-deposit/회원이_작성하지_않은_예산을_수정하면_실패한다_403/http-response.adoc[]

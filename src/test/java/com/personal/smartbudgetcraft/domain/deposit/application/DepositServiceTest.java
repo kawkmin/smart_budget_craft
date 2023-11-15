@@ -1,6 +1,8 @@
 package com.personal.smartbudgetcraft.domain.deposit.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -85,6 +87,79 @@ class DepositServiceTest {
       Long writeDepositId = depositService.writeDeposit(havePrevDepositMember, reqDto);
 
       assertThat(writeDepositId).isEqualTo(1L);
+    }
+  }
+
+  @Nested
+  @DisplayName("예산 수정 관련 서비스 테스트")
+  class updateDeposit {
+
+    @Test
+    @DisplayName("정상적으로 예산 수정에 성공한다.")
+    void 정상적으로_예산_수정에_성공한다() {
+      Member havePrevDepositMember = MemberTestHelper.createMemberWithDeposit(2L, budgetTracking,
+          deposit);
+      DepositCreateReqDto reqDto = DepositCreateReqDto.builder()
+          .categoryId(1L)
+          .cost(10000)
+          .build();
+
+      given(categoryRepository.findById(any())).willReturn(Optional.of(category));
+      given(depositRepository.findById(any())).willReturn(Optional.of(deposit));
+
+      Long updateDepositId = depositService.updateDeposit(havePrevDepositMember, deposit.getId(),
+          reqDto);
+      assertThat(updateDepositId).isEqualTo(deposit.getId());
+    }
+
+    @Test
+    @DisplayName("회원이 작성한 예산이 아니면, 예산 수정에 실패한다.")
+    void 회원이_작성한_예산이_아니면_예산_수정에_실패한다() {
+
+      // 다른 예산만 가진 회원
+      Deposit anotherDeposit = DepositTestHelper.createDepositWithMember(66L, category, member);
+      Member haveAnotherDepositMember = MemberTestHelper.createMemberWithDeposit(2L, budgetTracking,
+          anotherDeposit);
+
+      DepositCreateReqDto reqDto = DepositCreateReqDto.builder()
+          .categoryId(1L)
+          .cost(10000)
+          .build();
+
+      assertThatThrownBy(
+          () -> depositService.updateDeposit(haveAnotherDepositMember, deposit.getId(), reqDto)
+      );
+    }
+  }
+
+  @Nested
+  @DisplayName("예산 삭제 관련 서비스 테스트")
+  class deleteDeposit {
+
+    @Test
+    @DisplayName("예산 삭제가 정상적으로 성공한다.")
+    void 예산_삭제가_정상적으로_성공한다() {
+      Member havePrevDepositMember = MemberTestHelper.createMemberWithDeposit(2L, budgetTracking,
+          deposit);
+
+      given(depositRepository.findById(any())).willReturn(Optional.of(deposit));
+
+      assertThatNoException().isThrownBy(
+          () -> depositService.deleteDeposit(havePrevDepositMember, deposit.getId())
+      );
+    }
+
+    @Test
+    @DisplayName("회원이 작성한 예산이 아니면, 예산 삭제에 실패한다.")
+    void 회원이_작성한_예산이_아니면_예산_삭제에_실패한다() {
+      // 다른 예산만 가진 회원
+      Deposit anotherDeposit = DepositTestHelper.createDepositWithMember(66L, category, member);
+      Member haveAnotherDepositMember = MemberTestHelper.createMemberWithDeposit(2L, budgetTracking,
+          anotherDeposit);
+
+      assertThatThrownBy(
+          () -> depositService.deleteDeposit(haveAnotherDepositMember, deposit.getId())
+      );
     }
   }
 }

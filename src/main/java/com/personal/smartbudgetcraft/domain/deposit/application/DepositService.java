@@ -236,4 +236,74 @@ public class DepositService {
                 .sum()
         ).sum();
   }
+
+  /**
+   * 예산 수정
+   *
+   * @param member    회원
+   * @param depositId 수정할 예산 아이디
+   * @param reqDto    수정 데이터 정보
+   * @return 수정된 예산 아이디
+   */
+  @Transactional
+  public Long updateDeposit(Member member, Long depositId, DepositCreateReqDto reqDto) {
+    // 권한 확인
+    validUserAccessDeposit(member, depositId);
+
+    // 해당 예산 찾기
+    Deposit foundDeposit = getDepositById(depositId);
+
+    // 해당 카테고리 찾기
+    CostCategory foundCategory = getCategoryById(reqDto.getCategoryId());
+
+    // 수정
+    foundDeposit.update(reqDto, foundCategory);
+
+    return foundDeposit.getId();
+  }
+
+  /**
+   * 아이디로 예산 찾기. 없으면 예외
+   *
+   * @param depositId 찾을 id
+   * @return 찾은 예산
+   */
+  private Deposit getDepositById(Long depositId) {
+    return depositRepository.findById(depositId).orElseThrow(
+        () -> new BusinessException(depositId, "depositId", ErrorCode.DEPOSIT_NOT_FOUND)
+    );
+  }
+
+
+  /**
+   * 회원이 해당 예산을 바꿀 수 있는 권한이 있는지 확인. 없으면 예외
+   *
+   * @param member    회원
+   * @param depositId 대상 예산
+   */
+  private void validUserAccessDeposit(Member member, Long depositId) {
+    boolean isDepositMatchMember = member.getDeposits().stream()
+        .anyMatch(deposit -> deposit.getId().equals(depositId));
+
+    if (!isDepositMatchMember) {
+      throw new BusinessException(depositId, "depositId", ErrorCode.ACCESS_DENIED_EXCEPTION);
+    }
+  }
+
+  /**
+   * 예산 삭제
+   *
+   * @param member    회원
+   * @param depositId 삭제할 예산
+   */
+  @Transactional
+  public void deleteDeposit(Member member, Long depositId) {
+    // 권한 확인
+    validUserAccessDeposit(member, depositId);
+
+    // 예산 찾기
+    Deposit foundDeposit = getDepositById(depositId);
+
+    depositRepository.delete(foundDeposit);
+  }
 }
