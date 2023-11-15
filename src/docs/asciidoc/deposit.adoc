@@ -1,0 +1,32 @@
+== 예산
+
+=== 예산 설정
+
+Request
+
+include::{snippets}/write-deposit/정상적으로_입력될_때_예산_작성에_성공한다_201/http-request.adoc[]
+
+Response
+
+- 201
+include::{snippets}/write-deposit/정상적으로_입력될_때_예산_작성에_성공한다_201/http-response.adoc[]
+
+- 400 (예산 돈이 100원 단위가 아닐 때)
+include::{snippets}/write-deposit/예산_돈이_100원_단위가_아닐때_예산_작성에_실패한다_400/http-response.adoc[]
+
+- 404 (없는 카테고리를 입력할 때)
+include::{snippets}/write-deposit/카테고리가_없으면_예산_작성에_실패한다_404/http-response.adoc[]
+
+=== 예산 추천 시스템
+
+Request
+
+include::{snippets}/recommend-deposit/정상적으로_입력될_때_예산_추천에_성공한다_200/http-request.adoc[]
+
+Response
+
+- 200
+include::{snippets}/recommend-deposit/정상적으로_입력될_때_예산_추천에_성공한다_200/http-response.adoc[]
+
+- 400 (예산 추천 돈이 100원 단위가 아닐 때)
+include::{snippets}/recommend-deposit/예산_돈이_100원_단위가_아닐때_예산_추천에_실패한다_400/http-response.adoc[]

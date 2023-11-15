@@ -1,4 +1,4 @@
-= 02_02_geoRecommendEats API 명세
+= SmartBudgetCraft API 명세
 :doctype: book
 :icons: front
 :source-highlighter: highlightjs
@@ -70,3 +70,4 @@
 ```
 
 include::member.adoc[]
+include::deposit.adoc[]
