@@ -94,4 +94,52 @@ class ExpenditureServiceTest {
       );
     }
   }
+
+  @Nested
+  @DisplayName("지출 수정 관련 서비스 테스트")
+  class updateExpenditure {
+
+    @Test
+    @DisplayName("정상적으로 지출 수정에 성공한다.")
+    void 정상적으로_지출_수정에_성공한다() {
+      Member havePrevExpenditureMember = MemberTestHelper.createMemberWithExpenditure(2L,
+          budgetTracking,
+          expenditure);
+
+      ExpenditureWriteReqDto reqDto = ExpenditureWriteReqDto.builder()
+          .categoryId(1L)
+          .cost(10000)
+          .build();
+
+      given(categoryRepository.findById(any())).willReturn(Optional.of(category));
+      given(expenditureRepository.findById(any())).willReturn(Optional.of(expenditure));
+
+      Long updateExpenditureId = expenditureService.updateExpenditure(havePrevExpenditureMember,
+          expenditure.getId(),
+          reqDto);
+      assertThat(updateExpenditureId).isEqualTo(expenditure.getId());
+    }
+
+    @Test
+    @DisplayName("회원이 작성한 지출이 아니면, 지출 수정에 실패한다.")
+    void 회원이_작성한_지출이_아니면_지출_수정에_실패한다() {
+
+      // 다른 지출만 가진 회원
+      Expenditure anotherExpenditure = ExpenditureTestHelper.createExpenditure(66L, category,
+          member);
+      Member haveAnotherExpenditureMember = MemberTestHelper.createMemberWithExpenditure(2L,
+          budgetTracking,
+          anotherExpenditure);
+
+      ExpenditureWriteReqDto reqDto = ExpenditureWriteReqDto.builder()
+          .categoryId(1L)
+          .cost(10000)
+          .build();
+
+      assertThatThrownBy(
+          () -> expenditureService.updateExpenditure(haveAnotherExpenditureMember,
+              expenditure.getId(), reqDto)
+      );
+    }
+  }
 }

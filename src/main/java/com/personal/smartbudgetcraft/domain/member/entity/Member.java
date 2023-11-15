@@ -71,13 +71,15 @@ public class Member extends BaseEntity {
   private List<Expenditure> expenditures = new ArrayList<>();
 
   @Builder
+
   public Member(Long id, BudgetTracking budgetTracking, String account, String password, Role role,
-      List<Deposit> deposits) {
+      List<Deposit> deposits, List<Expenditure> expenditures) {
     this.id = id;
     this.budgetTracking = budgetTracking;
     this.account = account;
     this.password = password;
     this.role = role;
     this.deposits = deposits;
+    this.expenditures = expenditures;
   }
 }
