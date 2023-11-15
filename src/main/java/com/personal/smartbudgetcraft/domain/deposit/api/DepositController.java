@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -73,9 +74,27 @@ public class DepositController {
       @PathVariable(name = "depositId") Long depositId,
       @Valid @RequestBody DepositCreateReqDto reqDto
   ) {
-    depositService.updateDeposit(member, depositId, reqDto);
+    Long updatedDeposit = depositService.updateDeposit(member, depositId, reqDto);
 
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(ApiResDto.toSuccessForm(depositId));
+        .body(ApiResDto.toSuccessForm(updatedDeposit));
+  }
+
+  /**
+   * 예산 삭제
+   *
+   * @param member    회원
+   * @param depositId 삭제할 예산
+   * @return 204
+   */
+  @DeleteMapping("/{depositId}")
+  public ResponseEntity<ApiResDto> deleteDeposit(
+      @LoginMember Member member,
+      @PathVariable(name = "depositId") Long depositId
+  ) {
+    depositService.deleteDeposit(member, depositId);
+
+    return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        .body(ApiResDto.toSuccessForm(""));
   }
 }

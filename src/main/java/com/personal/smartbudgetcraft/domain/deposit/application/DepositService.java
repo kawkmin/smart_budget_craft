@@ -289,4 +289,21 @@ public class DepositService {
       throw new BusinessException(depositId, "depositId", ErrorCode.ACCESS_DENIED_EXCEPTION);
     }
   }
+
+  /**
+   * 예산 삭제
+   *
+   * @param member    회원
+   * @param depositId 삭제할 예산
+   */
+  @Transactional
+  public void deleteDeposit(Member member, Long depositId) {
+    // 권한 확인
+    validUserAccessDeposit(member, depositId);
+
+    // 예산 찾기
+    Deposit foundDeposit = getDepositById(depositId);
+
+    depositRepository.delete(foundDeposit);
+  }
 }
