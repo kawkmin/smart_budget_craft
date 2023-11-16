@@ -1,6 +1,7 @@
 package com.personal.smartbudgetcraft.domain.member;
 
 import com.personal.smartbudgetcraft.domain.deposit.entity.Deposit;
+import com.personal.smartbudgetcraft.domain.expenditure.entity.Expenditure;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
 import com.personal.smartbudgetcraft.domain.member.entity.Role;
 import com.personal.smartbudgetcraft.domain.member.entity.budgettracking.BudgetTracking;
@@ -19,7 +20,7 @@ public class MemberTestHelper {
         .deposits(new ArrayList<>())
         .build();
   }
-  
+
   public static Member createMemberWithDeposit(Long id, BudgetTracking budgetTracking,
       Deposit deposit) {
     return Member.builder()
@@ -29,6 +30,18 @@ public class MemberTestHelper {
         .role(Role.USER)
         .budgetTracking(budgetTracking)
         .deposits(List.of(deposit))
+        .build();
+  }
+
+  public static Member createMemberWithExpenditure(Long id, BudgetTracking budgetTracking,
+      Expenditure expenditure) {
+    return Member.builder()
+        .id(id)
+        .account("test123")
+        .password("test123*")
+        .role(Role.USER)
+        .budgetTracking(budgetTracking)
+        .expenditures(List.of(expenditure))
         .build();
   }
 }

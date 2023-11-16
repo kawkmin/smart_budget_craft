@@ -265,8 +265,8 @@ class DepositControllerTest extends AbstractRestDocsTests {
     }
 
     @Test
-    @DisplayName("회원이 작성하지 않은 예산을 수정하면, 실패한다.")
-    void 회원이_작성하지_않은_예산을_수정하면_실패한다_403() throws Exception {
+    @DisplayName("회원이 작성하지 않은 예산을 삭제하면, 실패한다.")
+    void 회원이_작성하지_않은_예산을_삭제하면_실패한다_403() throws Exception {
 
       doThrow(new BusinessException(43, "depositId", ErrorCode.ACCESS_DENIED_EXCEPTION))
           .when(depositService)

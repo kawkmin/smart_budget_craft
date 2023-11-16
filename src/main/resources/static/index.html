@@ -468,6 +468,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_예산_삭제">예산 삭제</a></li>
 </ul>
 </li>
+<li><a href="#_지출">지출</a>
+<ul class="sectlevel2">
+<li><a href="#_지출_작성">지출 작성</a></li>
+<li><a href="#_지출_상세_조회">지출 상세 조회</a></li>
+<li><a href="#_지출_수정">지출 수정</a></li>
+<li><a href="#_지출의_합계_제외_여부_변경">지출의 합계 제외 여부 변경</a></li>
+<li><a href="#_지출_삭제">지출 삭제</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -639,7 +648,7 @@ Content-Length: 280
 
 {
   "status" : "error",
-  "message" : "[asdfasdfasdf12] password: 비밀번호는 특수문자를 포함한 8~16자리 수 여야만 합니다., [asdfasdfasdf12] passwordConfirm: 비밀번호는 특수문자를 포함한 8~16자리 수 여야만 합니다.",
+  "message" : "[asdfasdfasdf12] passwordConfirm: 비밀번호는 특수문자를 포함한 8~16자리 수 여야만 합니다., [asdfasdfasdf12] password: 비밀번호는 특수문자를 포함한 8~16자리 수 여야만 합니다.",
   "data" : null
 }</code></pre>
 </div>
@@ -1258,11 +1267,417 @@ Content-Length: 119
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_지출">지출</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_지출_작성">지출 작성</h3>
+<div class="paragraph">
+<p>Request</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/v1/expenditure HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Content-Length: 142
+Host: localhost:8080
+
+{
+  "categoryId" : 1,
+  "cost" : 10000,
+  "memo" : "테스트 메모",
+  "isExcluded" : true,
+  "time" : "2023-11-16T12:20:40.2390314"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Response</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>201</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
+Content-Type: application/json;charset=UTF-8
+Content-Length: 64
+
+{
+  "status" : "success",
+  "message" : null,
+  "data" : 1
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>400 (지출 금액이 100원 이상의 단위가 아닐 때)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json;charset=UTF-8
+Content-Length: 114
+
+{
+  "status" : "error",
+  "message" : "[109009] cost: 100원 단위로 입력해주세요.",
+  "data" : null
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>404 (해당 카테고리가 없을 때)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 404 Not Found
+Content-Type: application/json;charset=UTF-8
+Content-Length: 122
+
+{
+  "status" : "error",
+  "message" : "[55] categoryId: 존재하지 않은 카테고리입니다.",
+  "data" : null
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_지출_상세_조회">지출 상세 조회</h3>
+<div class="paragraph">
+<p>Request</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/v1/expenditure/1 HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Response</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>200</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Content-Length: 233
+
+{
+  "status" : "success",
+  "message" : null,
+  "data" : {
+    "categoryName" : "테스트 카테고리",
+    "cost" : 10000,
+    "memo" : "Test Memo",
+    "time" : "2023-11-16T12:20:40.1650309",
+    "excluded" : true
+  }
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>403 (다른 회원의 지출을 조회할 때)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 403 Forbidden
+Content-Type: application/json;charset=UTF-8
+Content-Length: 119
+
+{
+  "status" : "error",
+  "message" : "[43] depositId: 필요한 접근 권한이 없습니다.",
+  "data" : null
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>404 (해당 지출이 없을 때)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 404 Not Found
+Content-Type: application/json;charset=UTF-8
+Content-Length: 119
+
+{
+  "status" : "error",
+  "message" : "[12] expenditureId: 존재하지 않은 지출입니다.",
+  "data" : null
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_지출_수정">지출 수정</h3>
+<div class="paragraph">
+<p>Request</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PUT /api/v1/deposit/1 HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Content-Length: 43
+Host: localhost:8080
+
+{
+  "categoryId" : 1,
+  "cost" : 10000
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Response</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>201</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
+Content-Type: application/json;charset=UTF-8
+Content-Length: 64
+
+{
+  "status" : "success",
+  "message" : null,
+  "data" : 1
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>400 (지출 금액이 100원 이상의 단위가 아닐 때)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json;charset=UTF-8
+Content-Length: 111
+
+{
+  "status" : "error",
+  "message" : "[109] cost: 100원 단위로 입력해주세요.",
+  "data" : null
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>403 (다른 회원의 지출을 수정할 때)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 403 Forbidden
+Content-Type: application/json;charset=UTF-8
+Content-Length: 119
+
+{
+  "status" : "error",
+  "message" : "[43] depositId: 필요한 접근 권한이 없습니다.",
+  "data" : null
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>404</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>(해당 카테고리가 없을 때)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 404 Not Found
+Content-Type: application/json;charset=UTF-8
+Content-Length: 122
+
+{
+  "status" : "error",
+  "message" : "[55] categoryId: 존재하지 않은 카테고리입니다.",
+  "data" : null
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>(해당 지출이 없을 때)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 404 Not Found
+Content-Type: application/json;charset=UTF-8
+Content-Length: 115
+
+{
+  "status" : "error",
+  "message" : "[12] depositId: 존재하지 않은 예산입니다.",
+  "data" : null
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_지출의_합계_제외_여부_변경">지출의 합계 제외 여부 변경</h3>
+<div class="paragraph">
+<p>Request</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PATCH /api/v1/expenditure/1/exclude HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Host: localhost:8080
+Content-Length: 14
+
+isExclude=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Response</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>200</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Content-Length: 65
+
+{
+  "status" : "success",
+  "message" : null,
+  "data" : ""
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>403 (다른 회원의 지출을 수정할 때)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 403 Forbidden
+Content-Type: application/json;charset=UTF-8
+Content-Length: 119
+
+{
+  "status" : "error",
+  "message" : "[43] depositId: 필요한 접근 권한이 없습니다.",
+  "data" : null
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_지출_삭제">지출 삭제</h3>
+<div class="paragraph">
+<p>Request</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /api/v1/expenditure/1 HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Response</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>204</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 204 No Content
+Content-Type: application/json;charset=UTF-8
+Content-Length: 65
+
+{
+  "status" : "success",
+  "message" : null,
+  "data" : ""
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>403 (다른 회원의 지출을 삭제할 때)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 403 Forbidden
+Content-Type: application/json;charset=UTF-8
+Content-Length: 119
+
+{
+  "status" : "error",
+  "message" : "[43] depositId: 필요한 접근 권한이 없습니다.",
+  "data" : null
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-11-15 11:56:22 +0900
+Last updated 2023-11-16 12:05:40 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

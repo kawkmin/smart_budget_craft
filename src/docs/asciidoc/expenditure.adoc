@@ -1,0 +1,105 @@
+== 지출
+
+=== 지출 작성
+
+Request
+
+include::{snippets}/write-expenditure/정상적으로_입력될_때_지출_작성에_성공한다_201/http-request.adoc[]
+
+Response
+
+- 201
+
+include::{snippets}/write-expenditure/정상적으로_입력될_때_지출_작성에_성공한다_201/http-response.adoc[]
+
+- 400 (지출 금액이 100원 이상의 단위가 아닐 때)
+
+include::{snippets}/write-expenditure/지출_돈이_100원_단위가_아닐때_지출_작성에_실패한다_400/http-response.adoc[]
+
+- 404 (해당 카테고리가 없을 때)
+
+include::{snippets}/write-expenditure/카테고리가_없으면_지출_작성에_실패한다_404/http-response.adoc[]
+
+=== 지출 상세 조회
+
+Request
+
+include::{snippets}/read-expenditure/지출_상세_조회가_정상적으로_성공한다_200/http-request.adoc[]
+
+Response
+
+- 200
+
+include::{snippets}/read-expenditure/지출_상세_조회가_정상적으로_성공한다_200/http-response.adoc[]
+
+- 403 (다른 회원의 지출을 조회할 때)
+
+include::{snippets}/read-expenditure/회원이_작성하지_않은_지출을_상세_조회하면_실패한다_403/http-response.adoc[]
+
+- 404 (해당 지출이 없을 때)
+
+include::{snippets}/read-expenditure/지출을_찾을_수_없으면_지출_조회에_실패한다_404/http-response.adoc[]
+
+=== 지출 수정
+
+Request
+
+include::{snippets}/update-deposit/예산_수정이_정상적으로_성공한다_201/http-request.adoc[]
+
+Response
+
+- 201
+
+include::{snippets}/update-deposit/예산_수정이_정상적으로_성공한다_201/http-response.adoc[]
+
+- 400 (지출 금액이 100원 이상의 단위가 아닐 때)
+
+include::{snippets}/update-deposit/예산_돈이_100원_단위가_아닐때_예산_수정에_실패한다_400/http-response.adoc[]
+
+- 403 (다른 회원의 지출을 수정할 때)
+
+include::{snippets}/update-deposit/회원이_작성하지_않은_예산을_수정하면_실패한다_403/http-response.adoc[]
+
+- 404
+
+(해당 카테고리가 없을 때)
+
+include::{snippets}/update-deposit/카테고리가_없으면_예산_수정에_실패한다_404/http-response.adoc[]
+
+(해당 지출이 없을 때)
+
+include::{snippets}/update-deposit/예산을_찾을_수_없으면_예산_수정에_실패한다_404/http-response.adoc[]
+
+=== 지출의 합계 제외 여부 변경
+
+Request
+
+include::{snippets}/update-expenditure/지출의_합계_제외_수정에_성공한다_200/http-request.adoc[]
+
+Response
+
+- 200
+
+include::{snippets}/update-expenditure/지출의_합계_제외_수정에_성공한다_200/http-response.adoc[]
+
+
+- 403 (다른 회원의 지출을 수정할 때)
+
+include::{snippets}/update-expenditure/회원이_작성하지_않은_지출의_합계_제외를_수정하면_실패한다_403/http-response.adoc[]
+
+=== 지출 삭제
+
+Request
+
+include::{snippets}/delete-expenditure/정상적으로_지출_삭제에_성공한다_204/http-request.adoc[]
+
+Response
+
+- 204
+
+include::{snippets}/delete-expenditure/정상적으로_지출_삭제에_성공한다_204/http-response.adoc[]
+
+- 403 (다른 회원의 지출을 삭제할 때)
+
+include::{snippets}/delete-expenditure/회원이_작성하지_않은_지출을_삭제하면_실패한다_403/http-response.adoc[]
+
