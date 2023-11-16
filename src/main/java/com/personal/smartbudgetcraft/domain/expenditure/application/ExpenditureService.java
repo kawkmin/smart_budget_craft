@@ -61,9 +61,9 @@ public class ExpenditureService {
    * @return 지출의 상세 데이터 정보
    */
   public ExpenditureDetailResDto readDetailExpenditure(Member member, Long expenditureId) {
+    Expenditure expenditure = getExpenditureById(expenditureId);
     // 자신의 지출만 읽을 수 있음
     validUserAccessExpenditure(member, expenditureId);
-    Expenditure expenditure = getExpenditureById(expenditureId);
 
     ExpenditureDetailResDto resDto = new ExpenditureDetailResDto(expenditure);
     return resDto;
@@ -79,11 +79,11 @@ public class ExpenditureService {
    */
   @Transactional
   public Long updateExpenditure(Member member, Long expenditureId, ExpenditureWriteReqDto reqDto) {
-    // 권한 확인
-    validUserAccessExpenditure(member, expenditureId);
-
     // 해당 지출 찾기
     Expenditure foundExpenditure = getExpenditureById(expenditureId);
+
+    // 권한 확인
+    validUserAccessExpenditure(member, expenditureId);
 
     // 해당 카테고리 찾기
     CostCategory foundCategory = getCategoryById(reqDto.getCategoryId());
@@ -133,8 +133,8 @@ public class ExpenditureService {
    */
   @Transactional
   public void updateExclude(Member member, Long expenditureId, Boolean isExclude) {
-    validUserAccessExpenditure(member, expenditureId);
     Expenditure expenditure = getExpenditureById(expenditureId);
+    validUserAccessExpenditure(member, expenditureId);
 
     expenditure.updateExclude(isExclude);
   }
@@ -147,8 +147,8 @@ public class ExpenditureService {
    */
   @Transactional
   public void deleteExpenditure(Member member, Long expenditureId) {
-    validUserAccessExpenditure(member, expenditureId);
     Expenditure expenditure = getExpenditureById(expenditureId);
+    validUserAccessExpenditure(member, expenditureId);
 
     expenditureRepository.delete(expenditure);
   }
