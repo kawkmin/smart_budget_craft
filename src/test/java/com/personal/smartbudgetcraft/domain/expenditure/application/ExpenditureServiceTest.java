@@ -12,6 +12,7 @@ import com.personal.smartbudgetcraft.domain.category.cost.entity.CostCategory;
 import com.personal.smartbudgetcraft.domain.expenditure.ExpenditureTestHelper;
 import com.personal.smartbudgetcraft.domain.expenditure.dao.ExpenditureRepository;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.request.ExpenditureWriteReqDto;
+import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpenditureDetailResDto;
 import com.personal.smartbudgetcraft.domain.expenditure.entity.Expenditure;
 import com.personal.smartbudgetcraft.domain.member.BudgetTrackingTestHelper;
 import com.personal.smartbudgetcraft.domain.member.MemberTestHelper;
@@ -97,6 +98,52 @@ class ExpenditureServiceTest {
   }
 
   @Nested
+  @DisplayName("지출 조회 관련 서비스 테스트")
+  class readExpenditure {
+
+    @Test
+    @DisplayName("지출 상세 조회에 성공한다.")
+    void 지출_상세_조회에_성공한다() {
+      Member havePrevExpenditureMember = MemberTestHelper.createMemberWithExpenditure(2L,
+          budgetTracking,
+          expenditure);
+
+      given(expenditureRepository.findById(1L)).willReturn(Optional.of(expenditure));
+
+      ExpenditureDetailResDto resDto = expenditureService.readDetailExpenditure(
+          havePrevExpenditureMember, expenditure.getId());
+
+      assertThat(resDto.getCategoryName()).isEqualTo(expenditure.getCategory().getName());
+      assertThat(resDto.getCost()).isEqualTo(expenditure.getCost());
+      assertThat(resDto.getTime()).isEqualTo(expenditure.getTime());
+      assertThat(resDto.getMemo()).isEqualTo(expenditure.getMemo());
+    }
+
+    @Test
+    @DisplayName("회원이 작성한 지출이 아니면, 지출 상세 조회에 실패한다.")
+    void 회원이_작성한_지출이_아니면_지출_상세_조회에_실패한다() {
+
+      // 다른 지출만 가진 회원
+      Expenditure anotherExpenditure = ExpenditureTestHelper.createExpenditure(66L, category,
+          member);
+      Member haveAnotherExpenditureMember = MemberTestHelper.createMemberWithExpenditure(2L,
+          budgetTracking,
+          anotherExpenditure);
+
+      ExpenditureWriteReqDto reqDto = ExpenditureWriteReqDto.builder()
+          .categoryId(1L)
+          .cost(10000)
+          .build();
+
+      assertThatThrownBy(
+          () -> expenditureService.updateExpenditure(haveAnotherExpenditureMember,
+              expenditure.getId(), reqDto)
+      );
+    }
+
+  }
+
+  @Nested
   @DisplayName("지출 수정 관련 서비스 테스트")
   class updateExpenditure {
 
@@ -132,14 +179,9 @@ class ExpenditureServiceTest {
           budgetTracking,
           anotherExpenditure);
 
-      ExpenditureWriteReqDto reqDto = ExpenditureWriteReqDto.builder()
-          .categoryId(1L)
-          .cost(10000)
-          .build();
-
       assertThatThrownBy(
-          () -> expenditureService.updateExpenditure(haveAnotherExpenditureMember,
-              expenditure.getId(), reqDto)
+          () -> expenditureService.readDetailExpenditure(haveAnotherExpenditureMember,
+              expenditure.getId())
       );
     }
 

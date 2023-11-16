@@ -4,14 +4,20 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.personal.smartbudgetcraft.config.restdocs.AbstractRestDocsTests;
+import com.personal.smartbudgetcraft.domain.category.CostCategoryTestHelper;
+import com.personal.smartbudgetcraft.domain.expenditure.ExpenditureTestHelper;
 import com.personal.smartbudgetcraft.domain.expenditure.application.ExpenditureService;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.request.ExpenditureWriteReqDto;
+import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpenditureDetailResDto;
+import com.personal.smartbudgetcraft.domain.expenditure.entity.Expenditure;
+import com.personal.smartbudgetcraft.domain.member.MemberTestHelper;
 import com.personal.smartbudgetcraft.global.error.BusinessException;
 import com.personal.smartbudgetcraft.global.error.ErrorCode;
 import java.time.LocalDateTime;
@@ -98,6 +104,49 @@ class ExpenditureControllerTest extends AbstractRestDocsTests {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(reqDto)))
         .andExpect(status().isNotFound());
+  }
+
+  @Nested
+  @DisplayName("지출 조회 관련 컨트롤러 테스트")
+  class readExpenditure {
+
+    @Test
+    @DisplayName("지출 상세 조회가 정상적으로 성공한다.")
+    void 지출_상세_조회가_정상적으로_성공한다_200() throws Exception {
+      Expenditure expenditure = ExpenditureTestHelper.createExpenditure(
+          1L, CostCategoryTestHelper.CreateCategory(1L), MemberTestHelper.createMember(1L, null)
+      );
+      ExpenditureDetailResDto resDto = new ExpenditureDetailResDto(expenditure);
+
+      given(expenditureService.readDetailExpenditure(any(), any())).willReturn(resDto);
+
+      mockMvc.perform(get(EXPENDITURE_URL + "/1"))
+          .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("지출을 찾을 수 없으면, 지출 조회에 실패한다.")
+    void 지출을_찾을_수_없으면_지출_조회에_실패한다_404() throws Exception {
+      given(expenditureService.readDetailExpenditure(any(), any())).willThrow(
+          new BusinessException(12L, "expenditureId", ErrorCode.EXPENDITURE_NOT_FOUND)
+      );
+
+      mockMvc.perform(get(EXPENDITURE_URL + "/1"))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("회원이 작성하지 않은 지출을 상세 조회하면, 실패한다.")
+    void 회원이_작성하지_않은_지출을_상세_조회하면_실패한다_403() throws Exception {
+
+      doThrow(new BusinessException(43, "depositId", ErrorCode.ACCESS_DENIED_EXCEPTION))
+          .when(expenditureService)
+          .readDetailExpenditure(any(), any());
+
+      mockMvc.perform(get(EXPENDITURE_URL + "/1"))
+          .andExpect(status().isForbidden());
+    }
+
   }
 
   @Nested
@@ -193,7 +242,7 @@ class ExpenditureControllerTest extends AbstractRestDocsTests {
 
     @Test
     @DisplayName("지출을 찾을 수 없으면, 지출 수정에 실패한다.")
-    void 지출을_찾을_수_없으면_지출_지출에_실패한다_404() throws Exception {
+    void 지출을_찾을_수_없으면_지출_수정에_실패한다_404() throws Exception {
       int normalCost = 10000; // 정상 값
 
       ExpenditureWriteReqDto reqDto = ExpenditureWriteReqDto.builder()
