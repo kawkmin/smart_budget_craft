@@ -6,14 +6,17 @@ import com.personal.smartbudgetcraft.domain.member.entity.Member;
 import com.personal.smartbudgetcraft.global.config.security.annotation.LoginMember;
 import com.personal.smartbudgetcraft.global.dto.response.ApiResDto;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -59,6 +62,25 @@ public class ExpenditureController {
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(ApiResDto.toSuccessForm(updatedExpenditureId));
+  }
+
+  /**
+   * 지출 합계 제외 여부 변경
+   *
+   * @param member        회원
+   * @param expenditureId 합계 제외를 변경할 지출
+   * @param isExclude     합계 제외 여부
+   * @return 200
+   */
+  @PatchMapping("/{expenditureId}/exclude")
+  public ResponseEntity<ApiResDto> updateExclude(
+      @LoginMember Member member,
+      @PathVariable(name = "expenditureId") Long expenditureId,
+      @NotNull @RequestParam Boolean isExclude
+  ) {
+    expenditureService.updateExclude(member, expenditureId, isExclude);
+
+    return ResponseEntity.ok(ApiResDto.toSuccessForm(""));
   }
 
 }

@@ -85,4 +85,13 @@ public class Expenditure {
     this.isExcluded = reqDto.getIsExcluded();
     this.time = reqDto.getTime();
   }
+
+  /**
+   * 합계 통계 제외 변경
+   *
+   * @param isExcluded 합계 통계 여부
+   */
+  public void updateExclude(Boolean isExcluded) {
+    this.isExcluded = isExcluded;
+  }
 }

@@ -106,4 +106,19 @@ public class ExpenditureService {
           ErrorCode.ACCESS_DENIED_EXCEPTION);
     }
   }
+
+  /**
+   * 지출 합계 제외 여부 변경
+   *
+   * @param member        회원
+   * @param expenditureId 합계 제외를 변경할 지출
+   * @param isExclude     합계 제외 여부
+   */
+  @Transactional
+  public void updateExclude(Member member, Long expenditureId, Boolean isExclude) {
+    validUserAccessExpenditure(member, expenditureId);
+    Expenditure expenditure = getExpenditureById(expenditureId);
+
+    expenditure.updateExclude(isExclude);
+  }
 }
