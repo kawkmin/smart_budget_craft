@@ -2,13 +2,19 @@ package com.personal.smartbudgetcraft.domain.expenditure.api;
 
 import com.personal.smartbudgetcraft.domain.expenditure.application.ExpenditureService;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.request.ExpenditureWriteReqDto;
+import com.personal.smartbudgetcraft.domain.expenditure.dto.request.SearchInfoReqDto;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpenditureDetailResDto;
+import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpendituresResDto;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
 import com.personal.smartbudgetcraft.global.config.security.annotation.LoginMember;
 import com.personal.smartbudgetcraft.global.dto.response.ApiResDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -61,6 +67,36 @@ public class ExpenditureController {
   ) {
     ExpenditureDetailResDto resDto = expenditureService.readDetailExpenditure(member,
         expenditureId);
+
+    return ResponseEntity.ok(ApiResDto.toSuccessForm(resDto));
+  }
+
+  /**
+   * 지출 목록 조회 + 필터링 기능
+   *
+   * @param member     회원
+   * @param pageable   페이지 정보
+   * @param startDate  시작 날짜
+   * @param endDate    마지막 날짜
+   * @param categoryId 카테고리 Id
+   * @param minCost    최소 금액
+   * @param maxCost    최대 금액
+   * @return 200, 필터링된 지출 목록 조회
+   */
+  @GetMapping
+  public ResponseEntity<ApiResDto> readSearchExpenditures(
+      @LoginMember Member member,
+      @PageableDefault(page = 0, size = 10) Pageable pageable,
+      @RequestParam(required = false) LocalDateTime startDate,
+      @RequestParam(required = false) LocalDateTime endDate,
+      @RequestParam(required = false) Long categoryId,
+      @RequestParam(required = false) @PositiveOrZero Integer minCost,
+      @RequestParam(required = false) @PositiveOrZero Integer maxCost
+  ) {
+    SearchInfoReqDto searchDto = new SearchInfoReqDto(pageable, startDate, endDate, categoryId,
+        minCost, maxCost);
+
+    ExpendituresResDto resDto = expenditureService.readSearchExpenditures(member, searchDto);
 
     return ResponseEntity.ok(ApiResDto.toSuccessForm(resDto));
   }
