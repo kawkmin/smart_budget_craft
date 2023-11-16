@@ -4,6 +4,7 @@ import com.personal.smartbudgetcraft.domain.category.cost.dao.CostCategoryReposi
 import com.personal.smartbudgetcraft.domain.category.cost.entity.CostCategory;
 import com.personal.smartbudgetcraft.domain.expenditure.dao.ExpenditureRepository;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.request.ExpenditureWriteReqDto;
+import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpenditureDetailResDto;
 import com.personal.smartbudgetcraft.domain.expenditure.entity.Expenditure;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
 import com.personal.smartbudgetcraft.global.error.BusinessException;
@@ -50,6 +51,22 @@ public class ExpenditureService {
     );
 
     return category;
+  }
+
+  /**
+   * 지출 상세 조회
+   *
+   * @param member        회원
+   * @param expenditureId 조회할 지출 id
+   * @return 지출의 상세 데이터 정보
+   */
+  public ExpenditureDetailResDto readDetailExpenditure(Member member, Long expenditureId) {
+    // 자신의 지출만 읽을 수 있음
+    validUserAccessExpenditure(member, expenditureId);
+    Expenditure expenditure = getExpenditureById(expenditureId);
+
+    ExpenditureDetailResDto resDto = new ExpenditureDetailResDto(expenditure);
+    return resDto;
   }
 
   /**

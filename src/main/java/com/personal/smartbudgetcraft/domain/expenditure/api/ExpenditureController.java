@@ -2,6 +2,7 @@ package com.personal.smartbudgetcraft.domain.expenditure.api;
 
 import com.personal.smartbudgetcraft.domain.expenditure.application.ExpenditureService;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.request.ExpenditureWriteReqDto;
+import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpenditureDetailResDto;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
 import com.personal.smartbudgetcraft.global.config.security.annotation.LoginMember;
 import com.personal.smartbudgetcraft.global.dto.response.ApiResDto;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +45,24 @@ public class ExpenditureController {
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(ApiResDto.toSuccessForm(wroteExpenditureId));
+  }
+
+  /**
+   * 지출 상세 조회
+   *
+   * @param member        회원
+   * @param expenditureId 조회할 지출 id
+   * @return 200, 지출의 상세 데이터 정보
+   */
+  @GetMapping("/{expenditureId}")
+  public ResponseEntity<ApiResDto> readDetailExpenditure(
+      @LoginMember Member member,
+      @PathVariable(name = "expenditureId") Long expenditureId
+  ) {
+    ExpenditureDetailResDto resDto = expenditureService.readDetailExpenditure(member,
+        expenditureId);
+
+    return ResponseEntity.ok(ApiResDto.toSuccessForm(resDto));
   }
 
   /**
