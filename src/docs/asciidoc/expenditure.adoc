@@ -40,6 +40,16 @@ include::{snippets}/read-expenditure/회원이_작성하지_않은_지출을_상
 
 include::{snippets}/read-expenditure/지출을_찾을_수_없으면_지출_조회에_실패한다_404/http-response.adoc[]
 
+=== 지출 목록 조회 및 필터링 기능
+
+Request
+
+include::{snippets}/read-expenditure/모든_파라미터가_없어도_지출_목록_조회에_성공한다_200/http-request.adoc[]
+
+Response
+
+include::{snippets}/read-expenditure/모든_파라미터가_없어도_지출_목록_조회에_성공한다_200/http-response.adoc[]
+
 === 지출 수정
 
 Request

@@ -4,12 +4,16 @@ import com.personal.smartbudgetcraft.domain.category.cost.dao.CostCategoryReposi
 import com.personal.smartbudgetcraft.domain.category.cost.entity.CostCategory;
 import com.personal.smartbudgetcraft.domain.expenditure.dao.ExpenditureRepository;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.request.ExpenditureWriteReqDto;
+import com.personal.smartbudgetcraft.domain.expenditure.dto.request.SearchInfoReqDto;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpenditureDetailResDto;
+import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpendituresResDto;
 import com.personal.smartbudgetcraft.domain.expenditure.entity.Expenditure;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
 import com.personal.smartbudgetcraft.global.error.BusinessException;
 import com.personal.smartbudgetcraft.global.error.ErrorCode;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -151,5 +155,61 @@ public class ExpenditureService {
     validUserAccessExpenditure(member, expenditureId);
 
     expenditureRepository.delete(expenditure);
+  }
+
+  /**
+   * 지출 목록 조회 + 필터링 기능
+   *
+   * @param member    회원
+   * @param searchDto 필터링 정보
+   * @return 필터링된 지출 목록 조회
+   */
+  public ExpendituresResDto readSearchExpenditures(Member member, SearchInfoReqDto searchDto) {
+    // 필터링 된 지출 목록을 Page<>로 가져옴
+    Page<Expenditure> searchedExpenditures = getSearchedExpenditures(member, searchDto);
+
+    // 총 지출 금액 계산
+    int totalCost = totalCostCalculator(searchedExpenditures.getContent());
+
+    ExpendituresResDto resDto = new ExpendituresResDto(searchedExpenditures, totalCost);
+    return resDto;
+  }
+
+  /**
+   * 동적 쿼리로 필터링된 지출 목록을 가져옴
+   * 카테고리가 null이 아니면 올바른 카테고리인지 확인
+   *
+   * @param member    회원
+   * @param searchDto 필터링 정보
+   * @return 필터링된 지출 목록 Page List
+   */
+  private Page<Expenditure> getSearchedExpenditures(Member member, SearchInfoReqDto searchDto) {
+    CostCategory category = null;
+
+    //카테고리가 null이 아니면 올바른 카테고리인지 확인
+    if (searchDto.getCategoryId() != null) {
+      category = getCategoryById(searchDto.getCategoryId());
+    }
+
+    return expenditureRepository.searchExpenditures(
+        searchDto.getPageable(), member, category,
+        searchDto.getStartDate(),
+        searchDto.getEndDate(),
+        searchDto.getMinCost(),
+        searchDto.getMaxCost());
+  }
+
+  /**
+   * 총 지출 금액 계산
+   * .isExcluded가 True인 것만 계산한다.
+   *
+   * @param expenditures 지출 목록
+   * @return 총 지출 금액
+   */
+  private int totalCostCalculator(List<Expenditure> expenditures) {
+    return expenditures.stream()
+        .filter(Expenditure::getIsExcluded)
+        .mapToInt(Expenditure::getCost)
+        .sum();
   }
 }
