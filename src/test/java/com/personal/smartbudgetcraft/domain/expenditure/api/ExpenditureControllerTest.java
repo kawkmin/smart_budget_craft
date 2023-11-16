@@ -3,6 +3,7 @@ package com.personal.smartbudgetcraft.domain.expenditure.api;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -232,6 +233,30 @@ class ExpenditureControllerTest extends AbstractRestDocsTests {
 
       mockMvc.perform(patch(EXPENDITURE_URL + "/1/exclude")
               .param("isExclude", String.valueOf(true)))
+          .andExpect(status().isForbidden());
+    }
+  }
+
+  @Nested
+  @DisplayName("지출 삭제 관련 컨트롤러 테스트")
+  class deleteDeposit {
+
+    @Test
+    @DisplayName("정상적으로 지출 삭제에 성공한다.")
+    void 정상적으로_지출_삭제에_성공한다_204() throws Exception {
+      mockMvc.perform(delete(EXPENDITURE_URL + "/1"))
+          .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("회원이 작성하지 않은 지출을 삭제하면, 실패한다.")
+    void 회원이_작성하지_않은_지출을_삭제하면_실패한다_403() throws Exception {
+
+      doThrow(new BusinessException(43, "depositId", ErrorCode.ACCESS_DENIED_EXCEPTION))
+          .when(expenditureService)
+          .deleteExpenditure(any(), any());
+
+      mockMvc.perform(delete(EXPENDITURE_URL + "/1"))
           .andExpect(status().isForbidden());
     }
   }

@@ -184,4 +184,39 @@ class ExpenditureServiceTest {
       );
     }
   }
+
+  @Nested
+  @DisplayName("지출 삭제 관련 서비스 테스트")
+  class deleteDeposit {
+
+    @Test
+    @DisplayName("지출 삭제가 정상적으로 성공한다.")
+    void 지출_삭제가_정상적으로_성공한다() {
+      Member havePrevDepositMember = MemberTestHelper.createMemberWithExpenditure(2L,
+          budgetTracking,
+          expenditure);
+
+      given(expenditureRepository.findById(any())).willReturn(Optional.of(expenditure));
+
+      assertThatNoException().isThrownBy(
+          () -> expenditureService.deleteExpenditure(havePrevDepositMember, expenditure.getId())
+      );
+    }
+
+    @Test
+    @DisplayName("회원이 작성한 지출이 아니면, 지출 삭제에 실패한다.")
+    void 회원이_작성한_지출이_아니면_지출_삭제에_실패한다() {
+      // 다른 지출만 가진 회원
+      Expenditure anotherExpenditure = ExpenditureTestHelper.createExpenditure(66L, category,
+          member);
+      Member haveAnotherExpenditureMember = MemberTestHelper.createMemberWithExpenditure(2L,
+          budgetTracking,
+          anotherExpenditure);
+
+      assertThatThrownBy(
+          () -> expenditureService.deleteExpenditure(haveAnotherExpenditureMember,
+              expenditure.getId())
+      );
+    }
+  }
 }
