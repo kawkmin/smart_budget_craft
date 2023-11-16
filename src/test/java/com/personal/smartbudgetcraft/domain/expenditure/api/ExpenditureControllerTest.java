@@ -16,16 +16,23 @@ import com.personal.smartbudgetcraft.domain.expenditure.ExpenditureTestHelper;
 import com.personal.smartbudgetcraft.domain.expenditure.application.ExpenditureService;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.request.ExpenditureWriteReqDto;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpenditureDetailResDto;
+import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpendituresResDto;
 import com.personal.smartbudgetcraft.domain.expenditure.entity.Expenditure;
 import com.personal.smartbudgetcraft.domain.member.MemberTestHelper;
 import com.personal.smartbudgetcraft.global.error.BusinessException;
 import com.personal.smartbudgetcraft.global.error.ErrorCode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 
 @WebMvcTest(controllers = ExpenditureController.class)
@@ -81,29 +88,29 @@ class ExpenditureControllerTest extends AbstractRestDocsTests {
               .content(objectMapper.writeValueAsString(reqDto)))
           .andExpect(status().isBadRequest());
     }
-  }
 
-  @Test
-  @DisplayName("카테고리가 없으면, 지출 작성에 실패한다.")
-  void 카테고리가_없으면_지출_작성에_실패한다_404() throws Exception {
-    int normalCost = 10000; // 정상 값
+    @Test
+    @DisplayName("카테고리가 없으면, 지출 작성에 실패한다.")
+    void 카테고리가_없으면_지출_작성에_실패한다_404() throws Exception {
+      int normalCost = 10000; // 정상 값
 
-    ExpenditureWriteReqDto reqDto = ExpenditureWriteReqDto.builder()
-        .categoryId(1L)
-        .cost(normalCost)
-        .isExcluded(true)
-        .memo("테스트 메모")
-        .time(LocalDateTime.now())
-        .build();
+      ExpenditureWriteReqDto reqDto = ExpenditureWriteReqDto.builder()
+          .categoryId(1L)
+          .cost(normalCost)
+          .isExcluded(true)
+          .memo("테스트 메모")
+          .time(LocalDateTime.now())
+          .build();
 
-    given(expenditureService.writeExpenditure(any(), any())).willThrow(
-        new BusinessException(55L, "categoryId", ErrorCode.COST_CATEGORY_NOT_FOUND)
-    );
+      given(expenditureService.writeExpenditure(any(), any())).willThrow(
+          new BusinessException(55L, "categoryId", ErrorCode.COST_CATEGORY_NOT_FOUND)
+      );
 
-    mockMvc.perform(post(EXPENDITURE_URL)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(reqDto)))
-        .andExpect(status().isNotFound());
+      mockMvc.perform(post(EXPENDITURE_URL)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(reqDto)))
+          .andExpect(status().isNotFound());
+    }
   }
 
   @Nested
@@ -147,6 +154,41 @@ class ExpenditureControllerTest extends AbstractRestDocsTests {
           .andExpect(status().isForbidden());
     }
 
+    @Test
+    @DisplayName("모든 파라미터가 없어도, 지출 목록 조회에 성공한다.")
+    void 모든_파라미터가_없어도_지출_목록_조회에_성공한다_200() throws Exception {
+      ExpendituresResDto resDto = getExpendituresResDto();
+
+      given(expenditureService.readSearchExpenditures(any(), any())).willReturn(resDto);
+
+      mockMvc.perform(get(EXPENDITURE_URL))
+          .andExpect(status().isOk());
+    }
+
+    /**
+     * 지출 목록 조회 데이터 정보 만들기
+     *
+     * @return 지출 목록 조회 데이터 정보
+     */
+    private ExpendituresResDto getExpendituresResDto() {
+      List<Expenditure> expenditures = new ArrayList<>();
+      for (int i = 1; i < 5; i++) {
+        expenditures.add(
+            ExpenditureTestHelper.createExpenditure((long) i,
+                CostCategoryTestHelper.CreateCategory((long) i),
+                MemberTestHelper.createMember(1L, null)
+            )
+        );
+      }
+      Pageable pageable = PageRequest.of(0, 10);
+      int start = (int) pageable.getOffset();
+      int end = Math.min((start + pageable.getPageSize()), expenditures.size());
+
+      Page<Expenditure> expenditurePage = new PageImpl<>(expenditures.subList(start, end), pageable,
+          expenditures.size());
+      ExpendituresResDto resDto = new ExpendituresResDto(expenditurePage, 40000);
+      return resDto;
+    }
   }
 
   @Nested
