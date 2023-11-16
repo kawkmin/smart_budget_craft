@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -83,4 +84,21 @@ public class ExpenditureController {
     return ResponseEntity.ok(ApiResDto.toSuccessForm(""));
   }
 
+  /**
+   * 지출 삭제
+   *
+   * @param member        회원
+   * @param expenditureId 삭제할 지출
+   * @return 204
+   */
+  @DeleteMapping("/{expenditureId}")
+  public ResponseEntity<ApiResDto> deleteExclude(
+      @LoginMember Member member,
+      @PathVariable(name = "expenditureId") Long expenditureId
+  ) {
+    expenditureService.deleteExpenditure(member, expenditureId);
+
+    return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        .body(ApiResDto.toSuccessForm(""));
+  }
 }

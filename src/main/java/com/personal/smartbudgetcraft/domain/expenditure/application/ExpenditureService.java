@@ -121,4 +121,18 @@ public class ExpenditureService {
 
     expenditure.updateExclude(isExclude);
   }
+
+  /**
+   * 지출 삭제
+   *
+   * @param member        회원
+   * @param expenditureId 삭제할 지출
+   */
+  @Transactional
+  public void deleteExpenditure(Member member, Long expenditureId) {
+    validUserAccessExpenditure(member, expenditureId);
+    Expenditure expenditure = getExpenditureById(expenditureId);
+
+    expenditureRepository.delete(expenditure);
+  }
 }
