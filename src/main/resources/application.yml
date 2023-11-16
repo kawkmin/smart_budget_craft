@@ -16,6 +16,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 1000
   data:
     redis:
       host: localhost

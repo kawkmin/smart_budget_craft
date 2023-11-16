@@ -1,5 +1,6 @@
 package com.personal.smartbudgetcraft.domain.expenditure.dao.querydsl;
 
+import static com.personal.smartbudgetcraft.domain.category.cost.entity.QCostCategory.costCategory;
 import static com.personal.smartbudgetcraft.domain.expenditure.entity.QExpenditure.expenditure;
 
 import com.personal.smartbudgetcraft.domain.category.cost.entity.CostCategory;
@@ -58,6 +59,8 @@ public class ExpenditureRepositoryImpl implements ExpenditureRepositoryCustom {
             minCostEq(minCost),
             maxCostEq(maxCost)
         )
+        .join(expenditure.category, costCategory)
+        .fetchJoin()
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
         .fetch();
