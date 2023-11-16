@@ -39,3 +39,6 @@ out/
 ### Rest Docs ###
 /src/main/resources/static/*.html
 !/src/main/resources/static/index.html
+
+## Query Dsl ###
+/src/main/generated/com/**
