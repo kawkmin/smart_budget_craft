@@ -90,6 +90,7 @@ public class DepositService {
 
   /**
    * 예산 설계 추천 시스템
+   * TODO List 보단 Map 이 안전해 보임
    *
    * @param reqDto 추천에 필요한 데이터 정보
    * @return 추천 예산 설계 결과
