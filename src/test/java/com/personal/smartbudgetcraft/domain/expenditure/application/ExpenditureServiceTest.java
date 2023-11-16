@@ -1,6 +1,7 @@
 package com.personal.smartbudgetcraft.domain.expenditure.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -139,6 +140,47 @@ class ExpenditureServiceTest {
       assertThatThrownBy(
           () -> expenditureService.updateExpenditure(haveAnotherExpenditureMember,
               expenditure.getId(), reqDto)
+      );
+    }
+
+    @Test
+    @DisplayName("정상적으로 지출의 합계 제외 수정에 성공한다.")
+    void 정상적으로_지출의_합계_제외_수정에_성공한다() {
+      // 파라미터 값
+      boolean param = true;
+
+      Member havePrevExpenditureMember = MemberTestHelper.createMemberWithExpenditure(2L,
+          budgetTracking,
+          expenditure);
+
+      given(expenditureRepository.findById(any())).willReturn(Optional.of(expenditure));
+
+      assertThatNoException().isThrownBy(
+          () -> expenditureService.updateExclude(havePrevExpenditureMember, expenditure.getId(),
+              param)
+      );
+    }
+
+    @Test
+    @DisplayName("회원이 작성한 지출이 아니면, 지출의 합계 제외 수정에 실패한다.")
+    void 회원이_작성한_지출이_아니면_지출의_합계_제외_수정에_실패한다() {
+      // 파라미터
+      boolean param = true;
+      // 다른 지출만 가진 회원
+      Expenditure anotherExpenditure = ExpenditureTestHelper.createExpenditure(66L, category,
+          member);
+      Member haveAnotherExpenditureMember = MemberTestHelper.createMemberWithExpenditure(2L,
+          budgetTracking,
+          anotherExpenditure);
+
+      ExpenditureWriteReqDto reqDto = ExpenditureWriteReqDto.builder()
+          .categoryId(1L)
+          .cost(10000)
+          .build();
+
+      assertThatThrownBy(
+          () -> expenditureService.updateExclude(haveAnotherExpenditureMember,
+              expenditure.getId(), param)
       );
     }
   }
