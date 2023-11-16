@@ -71,3 +71,4 @@
 
 include::member.adoc[]
 include::deposit.adoc[]
+include::expenditure.adoc[]

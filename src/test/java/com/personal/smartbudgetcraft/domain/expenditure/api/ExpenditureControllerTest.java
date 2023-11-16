@@ -288,7 +288,7 @@ class ExpenditureControllerTest extends AbstractRestDocsTests {
 
   @Nested
   @DisplayName("지출 삭제 관련 컨트롤러 테스트")
-  class deleteDeposit {
+  class deleteExpenditure {
 
     @Test
     @DisplayName("정상적으로 지출 삭제에 성공한다.")
