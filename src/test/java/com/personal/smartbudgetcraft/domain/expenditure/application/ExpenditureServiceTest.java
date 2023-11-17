@@ -157,14 +157,14 @@ class ExpenditureServiceTest {
       ExpenditureWriteReqDto reqDto = ExpenditureWriteReqDto.builder()
           .categoryId(1L)
           .cost(10000)
+          .isExcluded(true)
           .build();
 
       given(categoryRepository.findById(any())).willReturn(Optional.of(category));
       given(expenditureRepository.findById(any())).willReturn(Optional.of(expenditure));
 
       Long updateExpenditureId = expenditureService.updateExpenditure(havePrevExpenditureMember,
-          expenditure.getId(),
-          reqDto);
+          expenditure.getId(), reqDto);
       assertThat(updateExpenditureId).isEqualTo(expenditure.getId());
     }
 
