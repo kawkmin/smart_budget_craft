@@ -108,13 +108,13 @@ public class DepositService {
     List<CostCategory> allCategories = categoryRepository.findAll();
 
     // 2. 모든 카테고리의 예산 금액을 합친 총합 계산. (모든 유저의 예산 총 금액)
-    int usersTotalSum = getTotalSumByCategories(allCategories);
+    int usersTotalSum = calculatorTotalSumByCategories(allCategories);
 
     // 3. 카테고리별 통계 퍼센트 결과를 List로 저장
-    List<Double> percentageResult = getPercentageResult(allCategories, usersTotalSum);
+    List<Double> percentageResult = calculatorPercentageResult(allCategories, usersTotalSum);
 
     // 4. 모든 예산 금액 추천의 결과를 List로 저장
-    List<Integer> recommendResult = getRecommendResult(reqDto.getCost(), percentageResult);
+    List<Integer> recommendResult = calculatorRecommendResult(reqDto.getCost(), percentageResult);
 
     // 5. 예산 추천 결과를 원하는 API 형식으로 포맷팅
     List<DepositResultResDto> depositResultResDtoList = formatResult(
@@ -131,6 +131,7 @@ public class DepositService {
   }
 
   /**
+   * 계산기
    * 예산 금액 추천을 계산
    * 카테고리의 예산 금액 = 반올림((예산 금액) * (해당 카테고리의 퍼센테이지 / 100)) / 최소 단위 금액) * 최소 단위 금액
    *
@@ -138,7 +139,7 @@ public class DepositService {
    * @param percentageResult 카테고리 별 금액 퍼센트
    * @return 카테고리별 예산 금액 리스트
    */
-  private List<Integer> getRecommendResult(
+  private List<Integer> calculatorRecommendResult(
       int cost,
       List<Double> percentageResult
   ) {
@@ -210,13 +211,14 @@ public class DepositService {
   }
 
   /**
+   * 계산기
    * 카테고리별 통계 퍼센트를 계산
    *
    * @param allCategories 모든 카테고리
    * @param usersTotalSum 유저들의 총 예산 금액
    * @return 계산된 카테고리별 통계 퍼센트 List
    */
-  private List<Double> getPercentageResult(
+  private List<Double> calculatorPercentageResult(
       List<CostCategory> allCategories,
       int usersTotalSum
   ) {
@@ -230,12 +232,13 @@ public class DepositService {
   }
 
   /**
+   * 계산기
    * 카테고리로 모든 유저의 예산 금액 계산
    *
    * @param allCategories 모든 카테고리
    * @return 모든 유저의 예산 금액
    */
-  private int getTotalSumByCategories(List<CostCategory> allCategories) {
+  private int calculatorTotalSumByCategories(List<CostCategory> allCategories) {
     return allCategories.stream()
         .map(CostCategory::getDeposits)
         .mapToInt(deposits ->

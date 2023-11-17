@@ -176,6 +176,7 @@ public class ExpenditureConsultingService {
   }
 
   /**
+   * 계산기
    * 회원의 하루 예산 구하기
    *
    * @param member 회원
@@ -196,6 +197,7 @@ public class ExpenditureConsultingService {
   }
 
   /**
+   * 계산기
    * 이번달의 남은 날짜 계산
    *
    * @return 이번달의 남은 날짜
