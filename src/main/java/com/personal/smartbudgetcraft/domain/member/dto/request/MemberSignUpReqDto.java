@@ -71,7 +71,7 @@ public class MemberSignUpReqDto {
         .account(this.account)
         .password(passwordEncoder.encode(this.password))
         .role(Role.USER)
-        .budgetTracking(BudgetTracking.resetBudget())
+        .budgetTracking(BudgetTracking.createBudget())
         .build();
   }
 }

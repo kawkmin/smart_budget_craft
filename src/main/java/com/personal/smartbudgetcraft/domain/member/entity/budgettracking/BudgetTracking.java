@@ -43,11 +43,19 @@ public class BudgetTracking {
   }
 
   /**
-   * 처음 생성 하거나, 매달 처음 요일 일 때, 재산 초기화
+   * 재산 초기화
+   */
+  public void resetBudget() {
+    this.totalExpenditureCost = 0;
+    this.totalDepositCost = 0;
+  }
+
+  /**
+   * 처음 생성할 때 사용
    *
    * @return 초기화된 재산 트래킹
    */
-  public static BudgetTracking resetBudget() {
+  public static BudgetTracking createBudget() {
     return BudgetTracking.builder()
         .totalDepositCost(0)
         .totalExpenditureCost(0)
@@ -71,4 +79,5 @@ public class BudgetTracking {
   public void updateExpenditureCost(Integer cost) {
     this.totalExpenditureCost += cost;
   }
+
 }
