@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ExpenditureConsultingService {
 
+  // 최소 추천 금액
+  public static final int MIN_RECOMMEND_COST = 1000;
   private final CostCategoryRepository categoryRepository;
 
   /**
@@ -38,44 +40,61 @@ public class ExpenditureConsultingService {
     int dayOfDeposit = calculatorDayOfDeposit(member);
     // 회원의 남은 총 예산 돈 (남은 날짜 * 하루 예산)
     int remainTotalCost = remainingDays * dayOfDeposit;
-    // 회원의 하루에 써야할 예산 돈
+    // 회원의 하루에 사용 해야할 예산
     int remainDayOfDeposit = remainTotalCost / remainingDays;
+
+    // 회원의 예산들의 카테고리 분석을 통해, 추천 지출 계산
+    // 추천 지출을 저장할 List
+    List<ExpenditureRecommendTodayResDto> recommendTodayExpenditure = new ArrayList<>();
+    // 계산하면서, List에 저장
+    calculatorRecommendTodayCost(member, remainDayOfDeposit, recommendTodayExpenditure);
+
+    // 오늘의 추천 총 금액 계산
+    int recommendTodayCost = recommendTodayExpenditure.stream()
+        .mapToInt(ExpenditureRecommendTodayResDto::getCost)
+        .sum();
+
+    // Res Dto 생성
+    ExpendituresRecommendTodayResDto resDto = ExpendituresRecommendTodayResDto.builder()
+        .recommendExpenditures(recommendTodayExpenditure)
+        .remainDays(remainingDays)
+        .recommendCost(recommendTodayCost)
+        .remainTotalCost(remainTotalCost)
+        .build();
+
+    return resDto;
+  }
+
+  /**
+   * 종합 계산기
+   * 회원의 예산들의 카테고리 분석을 통해, 오늘의 추천 지출 계산
+   *
+   * @param member                    회원
+   * @param remainDayOfDeposit        회원의 하루에 사용 해야할 예산
+   * @param recommendTodayExpenditure 추천 지출을 저장할 List
+   */
+  private void calculatorRecommendTodayCost(
+      Member member,
+      int remainDayOfDeposit,
+      List<ExpenditureRecommendTodayResDto> recommendTodayExpenditure
+  ) {
     // 회원의 총 예산
     int totalDepositCost = member.getBudgetTracking().getTotalDepositCost();
-
+    // 카테고리 별 총 합을 계산할 Map
     Map<Long, Integer> categoryRecommendCostMap = new HashMap<>();
-
     // 회원이 가진 예산의 카테고리 별 총 합이 담긴 map
     Map<Long, Integer> categoryCostSumMap = new HashMap<>();
-    // 회원이 가진 예산의 카테고리 별 총 합 계산
-    member.getDeposits().stream()
-        .forEach(deposit ->
-            categoryCostSumMap.put(deposit.getCategory().getId(),
-                categoryCostSumMap.getOrDefault(deposit.getCategory().getId(), 0))
-        );
-
     // 회원이 가진 예산의 카테고리 별 총 합의 퍼센트가 담긴 map
     Map<Long, Integer> categoryCostPercentMap = new HashMap<>();
-    // 회원이 가진 예산의 카테고리 별 총 합의 퍼센트 계산
-    // (${카테고리의 예산 금액 합} / ${총 예산 금액 합}) * 100
-    for (Long id : categoryCostSumMap.keySet()) {
-      int cost = categoryCostSumMap.get(id);
-      int percent = (int) ((long) cost / totalDepositCost) * PERCENT_UNIT;
-      categoryCostPercentMap.put(id, percent);
-    }
 
-    // 카테고리 별 추천 금액 계산. 최소 단위는 100이다.
-    // 반올림(${카테고리의 예산 금액 합} * (${카테고리의 예산 퍼센트} / 100)/ 최소 단위) *최소 단위
-    for (Long id : categoryCostPercentMap.keySet()) {
-      Integer percent = categoryCostPercentMap.get(id);
-      Integer cost = categoryCostSumMap.get(id);
-      double categoryCost =
-          Math.round(cost * ((long) percent / PERCENT_UNIT) / MIN_COST_UNIT) * MIN_COST_UNIT;
+    // 1. 회원이 가진 예산의 카테고리 별 총 합 계산
+    calculatorCategoryCostSum(member, categoryCostSumMap);
+    // 2. 회원이 가진 예산의 카테고리 별 총 합의 퍼센트 계산
+    calculatorCategoryCostPercent(categoryCostSumMap, totalDepositCost, categoryCostPercentMap);
+    // 3. 카테고리 별 추천 금액 계산.
+    calculatorRecommendCost(remainDayOfDeposit, categoryCostPercentMap, categoryRecommendCostMap);
 
-      categoryRecommendCostMap.put(id, (int) categoryCost);
-    }
-
-    List<ExpenditureRecommendTodayResDto> recommendTodayExpenditure = new ArrayList<>();
+    // 4. 계산된 데이터 정보로 list에 dto로 변환 후 추가
     for (Long id : categoryRecommendCostMap.keySet()) {
       int recommendCost = categoryRecommendCostMap.get(id);
       CostCategory category = categoryRepository.findById(id).orElseThrow();
@@ -87,11 +106,73 @@ public class ExpenditureConsultingService {
 
       recommendTodayExpenditure.add(data);
     }
+  }
 
-    ExpendituresRecommendTodayResDto resDto = new ExpendituresRecommendTodayResDto(
-        recommendTodayExpenditure, remainTotalCost);
+  /**
+   * 계산기.
+   * 카테고리 별 추천 금액 계산
+   * 계산식 = 반올림(${하루에 사용 해야할 예산} * (${지출의 카테고리 예산 퍼센트} / 100)/ 최소 단위) *최소 단위
+   *
+   * @param remainDayOfDeposit       하루에 사용 해야할 예산
+   * @param categoryCostPercentMap   회원이 가진 예산의 카테고리 별 총 합이 담긴 map
+   * @param categoryRecommendCostMap 회원이 가진 예산의 카테고리 별 총 합의 퍼센트가 담긴 map
+   */
+  private void calculatorRecommendCost(
+      int remainDayOfDeposit,
+      Map<Long, Integer> categoryCostPercentMap,
+      Map<Long, Integer> categoryRecommendCostMap
+  ) {
+    for (Long id : categoryCostPercentMap.keySet()) {
+      Integer percent = categoryCostPercentMap.get(id);
+      double categoryCost =
+          Math.round(
+              remainDayOfDeposit * ((double) percent / (double) PERCENT_UNIT) / MIN_COST_UNIT
+          ) * MIN_COST_UNIT;
 
-    return resDto;
+      // 최소 추천 금액보다 작으면, 최소 금액으로 설정
+      if (categoryCost <= MIN_RECOMMEND_COST) {
+        categoryCost = MIN_RECOMMEND_COST;
+      }
+
+      categoryRecommendCostMap.put(id, (int) categoryCost);
+    }
+  }
+
+  /**
+   * 계산기
+   * 회원이 가진 예산의 카테고리 별 총 합의 퍼센트 계산
+   * 계산식 = (${카테고리의 예산 금액 합} / ${총 예산 금액 합}) * 100
+   *
+   * @param categoryCostSumMap     회원이 가진 예산의 카테고리 별 총 합이 담긴 map
+   * @param totalDepositCost       회원의 총 예산
+   * @param categoryCostPercentMap 회원이 가진 예산의 카테고리 별 총 합의 퍼센트가 담긴 map
+   */
+  private void calculatorCategoryCostPercent(
+      Map<Long, Integer> categoryCostSumMap,
+      int totalDepositCost,
+      Map<Long, Integer> categoryCostPercentMap
+  ) {
+    for (Long id : categoryCostSumMap.keySet()) {
+      int cost = categoryCostSumMap.get(id);
+      int percent = (int) (((double) cost / totalDepositCost) * PERCENT_UNIT);
+      categoryCostPercentMap.put(id, percent);
+    }
+  }
+
+  /**
+   * 계산기
+   * 회원이 가진 예산의 카테고리 별 총 합 계산
+   *
+   * @param member             회원
+   * @param categoryCostSumMap 카테고리 별 총 합을 계산할 Map
+   */
+  private void calculatorCategoryCostSum(Member member, Map<Long, Integer> categoryCostSumMap) {
+    member.getDeposits()
+        .forEach(deposit ->
+            categoryCostSumMap.put(deposit.getCategory().getId(),
+                categoryCostSumMap.getOrDefault(deposit.getCategory().getId(), 0)
+                    + deposit.getCost())
+        );
   }
 
   /**
