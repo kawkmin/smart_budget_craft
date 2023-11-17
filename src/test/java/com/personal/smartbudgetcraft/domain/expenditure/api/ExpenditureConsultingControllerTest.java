@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.personal.smartbudgetcraft.config.restdocs.AbstractRestDocsTests;
 import com.personal.smartbudgetcraft.domain.expenditure.application.ExpenditureConsultingService;
+import com.personal.smartbudgetcraft.domain.expenditure.constant.AdviceExpenditureComment;
+import com.personal.smartbudgetcraft.domain.expenditure.dto.response.AdviceCommentResDto;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpenditureRecommendTodayResDto;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpendituresRecommendTodayResDto;
 import java.util.ArrayList;
@@ -27,7 +29,7 @@ class ExpenditureConsultingControllerTest extends AbstractRestDocsTests {
 
   @Nested
   @DisplayName("오늘 지출 가능한 금액 추천 관련 컨트롤러 테스트")
-  class recommend {
+  class recommendExpenditure {
 
     @Test
     @DisplayName("정상적으로 오늘 지출 가능한 금액 추천이 실행된다.")
@@ -47,6 +49,26 @@ class ExpenditureConsultingControllerTest extends AbstractRestDocsTests {
       given(expenditureConsultingService.recommendTodayExpenditure(any())).willReturn(resDto);
 
       mockMvc.perform(get(EXPENDITURE_CONSULTING_URL + "/recommend"))
+          .andExpect(status().isOk());
+    }
+  }
+
+  @Nested
+  @DisplayName("유저 상황에 맞는 멘트 관련 컨트롤러 테스트")
+  class advice {
+
+    @Test
+    @DisplayName("정상적으로 멘트 호출이 실행된다.")
+    void 정상적으로_멘트_호출이_실행된다() throws Exception {
+      AdviceCommentResDto resDto = AdviceCommentResDto.builder()
+          .comment(AdviceExpenditureComment.SAVING_WELL.getComment())
+          .remainDays(14)
+          .remainDeposit(638800)
+          .build();
+
+      given(expenditureConsultingService.adviceComment(any())).willReturn(resDto);
+
+      mockMvc.perform(get(EXPENDITURE_CONSULTING_URL + "/advice"))
           .andExpect(status().isOk());
     }
   }
