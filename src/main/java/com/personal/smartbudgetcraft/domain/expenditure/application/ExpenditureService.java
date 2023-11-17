@@ -40,6 +40,10 @@ public class ExpenditureService {
     Expenditure expenditure = reqDto.toEntity(category, member);
 
     Long wroteExpenditureId = expenditureRepository.save(expenditure).getId();
+    // 재산 트래킹 업데이트
+    if (reqDto.getIsExcluded()) {
+      member.getBudgetTracking().updateExpenditureCost(reqDto.getCost());
+    }
     return wroteExpenditureId;
   }
 
@@ -94,6 +98,11 @@ public class ExpenditureService {
 
     // 수정
     foundExpenditure.update(reqDto, foundCategory);
+    // 재산 트래킹 업데이트
+    if (reqDto.getIsExcluded()) {
+      member.getBudgetTracking()
+          .updateExpenditureCost(reqDto.getCost() - foundExpenditure.getCost());
+    }
 
     return foundExpenditure.getId();
 
@@ -153,6 +162,10 @@ public class ExpenditureService {
   public void deleteExpenditure(Member member, Long expenditureId) {
     Expenditure expenditure = getExpenditureById(expenditureId);
     validUserAccessExpenditure(member, expenditureId);
+    // 재산 트래킹 업데이트
+    if (expenditure.getIsExcluded()) {
+      member.getBudgetTracking().updateExpenditureCost(-expenditure.getCost());
+    }
 
     expenditureRepository.delete(expenditure);
   }

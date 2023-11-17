@@ -9,6 +9,7 @@ import com.personal.smartbudgetcraft.domain.deposit.dto.response.DepositRecommen
 import com.personal.smartbudgetcraft.domain.deposit.dto.response.DepositResultResDto;
 import com.personal.smartbudgetcraft.domain.deposit.entity.Deposit;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
+import com.personal.smartbudgetcraft.domain.member.entity.budgettracking.BudgetTracking;
 import com.personal.smartbudgetcraft.global.error.BusinessException;
 import com.personal.smartbudgetcraft.global.error.ErrorCode;
 import java.util.ArrayList;
@@ -48,7 +49,9 @@ public class DepositService {
 
     // 이전의 카테고리에 대한 금액이 있을 때, 업데이트 로직 수행
     if (optionalPrevDeposit.isPresent()) {
-      return updateDepositCost(reqDto.getCost(), optionalPrevDeposit.get());
+      Long depositId = updateDepositCost(reqDto.getCost(), optionalPrevDeposit.get(),
+          member.getBudgetTracking());
+      return depositId;
     }
 
     // 이전의 카테고리에 대한 금액이 없을 때
@@ -59,6 +62,8 @@ public class DepositService {
 
     // 저장 후 id 갖기
     Long depositId = depositRepository.save(deposit).getId();
+    // 재산 트래킹 업데이트
+    member.getBudgetTracking().updateDepositCost(reqDto.getCost());
     return depositId;
   }
 
@@ -69,8 +74,10 @@ public class DepositService {
    * @param deposit 대상 예산
    * @return 업데이트 된 예산 id
    */
-  private Long updateDepositCost(Integer cost, Deposit deposit) {
+  private Long updateDepositCost(Integer cost, Deposit deposit, BudgetTracking budgetTracking) {
     deposit.addCost(cost);
+    // 재산 트래킹 업데이트
+    budgetTracking.updateDepositCost(cost);
     return deposit.getId();
   }
 
@@ -90,6 +97,7 @@ public class DepositService {
 
   /**
    * 예산 설계 추천 시스템
+   * TODO List 보단 Map 이 안전해 보임
    *
    * @param reqDto 추천에 필요한 데이터 정보
    * @return 추천 예산 설계 결과
@@ -100,13 +108,13 @@ public class DepositService {
     List<CostCategory> allCategories = categoryRepository.findAll();
 
     // 2. 모든 카테고리의 예산 금액을 합친 총합 계산. (모든 유저의 예산 총 금액)
-    int usersTotalSum = getTotalSumByCategories(allCategories);
+    int usersTotalSum = calculatorTotalSumByCategories(allCategories);
 
     // 3. 카테고리별 통계 퍼센트 결과를 List로 저장
-    List<Double> percentageResult = getPercentageResult(allCategories, usersTotalSum);
+    List<Double> percentageResult = calculatorPercentageResult(allCategories, usersTotalSum);
 
     // 4. 모든 예산 금액 추천의 결과를 List로 저장
-    List<Integer> recommendResult = getRecommendResult(reqDto.getCost(), percentageResult);
+    List<Integer> recommendResult = calculatorRecommendResult(reqDto.getCost(), percentageResult);
 
     // 5. 예산 추천 결과를 원하는 API 형식으로 포맷팅
     List<DepositResultResDto> depositResultResDtoList = formatResult(
@@ -123,6 +131,7 @@ public class DepositService {
   }
 
   /**
+   * 계산기
    * 예산 금액 추천을 계산
    * 카테고리의 예산 금액 = 반올림((예산 금액) * (해당 카테고리의 퍼센테이지 / 100)) / 최소 단위 금액) * 최소 단위 금액
    *
@@ -130,7 +139,7 @@ public class DepositService {
    * @param percentageResult 카테고리 별 금액 퍼센트
    * @return 카테고리별 예산 금액 리스트
    */
-  private List<Integer> getRecommendResult(
+  private List<Integer> calculatorRecommendResult(
       int cost,
       List<Double> percentageResult
   ) {
@@ -202,13 +211,14 @@ public class DepositService {
   }
 
   /**
+   * 계산기
    * 카테고리별 통계 퍼센트를 계산
    *
    * @param allCategories 모든 카테고리
    * @param usersTotalSum 유저들의 총 예산 금액
    * @return 계산된 카테고리별 통계 퍼센트 List
    */
-  private List<Double> getPercentageResult(
+  private List<Double> calculatorPercentageResult(
       List<CostCategory> allCategories,
       int usersTotalSum
   ) {
@@ -222,12 +232,13 @@ public class DepositService {
   }
 
   /**
+   * 계산기
    * 카테고리로 모든 유저의 예산 금액 계산
    *
    * @param allCategories 모든 카테고리
    * @return 모든 유저의 예산 금액
    */
-  private int getTotalSumByCategories(List<CostCategory> allCategories) {
+  private int calculatorTotalSumByCategories(List<CostCategory> allCategories) {
     return allCategories.stream()
         .map(CostCategory::getDeposits)
         .mapToInt(deposits ->
@@ -258,6 +269,8 @@ public class DepositService {
 
     // 수정
     foundDeposit.update(reqDto, foundCategory);
+    // 재산 트래킹 업데이트
+    member.getBudgetTracking().updateDepositCost(reqDto.getCost() - foundDeposit.getCost());
 
     return foundDeposit.getId();
   }
@@ -305,5 +318,7 @@ public class DepositService {
     Deposit foundDeposit = getDepositById(depositId);
 
     depositRepository.delete(foundDeposit);
+    // 재산 트래킹 업데이트
+    member.getBudgetTracking().updateDepositCost(-foundDeposit.getCost());
   }
 }

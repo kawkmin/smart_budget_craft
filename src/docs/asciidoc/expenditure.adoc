@@ -113,3 +113,28 @@ include::{snippets}/delete-expenditure/정상적으로_지출_삭제에_성공�
 
 include::{snippets}/delete-expenditure/회원이_작성하지_않은_지출을_삭제하면_실패한다_403/http-response.adoc[]
 
+== 지출 컨설팅
+
+=== 오늘의 지출 추천
+
+Request
+
+include::{snippets}/recommend-expenditure/정상적으로_오늘_지출_가능한_금액_추천이_실행된다/http-request.adoc[]
+
+Response
+
+- 200
+
+include::{snippets}/recommend-expenditure/정상적으로_오늘_지출_가능한_금액_추천이_실행된다/http-response.adoc[]
+
+=== 유저의 상황에 맞는 멘트 호출
+
+Request
+
+include::{snippets}/advice/정상적으로_멘트_호출이_실행된다/http-request.adoc[]
+
+Response
+
+- 200
+
+include::{snippets}/advice/정상적으로_멘트_호출이_실행된다/http-response.adoc[]
