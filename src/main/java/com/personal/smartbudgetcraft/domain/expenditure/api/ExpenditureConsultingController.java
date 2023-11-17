@@ -1,6 +1,7 @@
 package com.personal.smartbudgetcraft.domain.expenditure.api;
 
 import com.personal.smartbudgetcraft.domain.expenditure.application.ExpenditureConsultingService;
+import com.personal.smartbudgetcraft.domain.expenditure.dto.response.AdviceCommentResDto;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpendituresRecommendTodayResDto;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
 import com.personal.smartbudgetcraft.global.config.security.annotation.LoginMember;
@@ -30,6 +31,21 @@ public class ExpenditureConsultingController {
   ) {
     ExpendituresRecommendTodayResDto resDto = expenditureConsultingService.recommendTodayExpenditure(
         member);
+
+    return ResponseEntity.ok(ApiResDto.toSuccessForm(resDto));
+  }
+
+  /**
+   * 회원 상황에 맞는 멘트 호출
+   *
+   * @param member 회원
+   * @return 200, 회원 상황에 맞는 멘트
+   */
+  @GetMapping("/advice")
+  public ResponseEntity<ApiResDto> adviceComment(
+      @LoginMember Member member
+  ) {
+    AdviceCommentResDto resDto = expenditureConsultingService.adviceComment(member);
 
     return ResponseEntity.ok(ApiResDto.toSuccessForm(resDto));
   }

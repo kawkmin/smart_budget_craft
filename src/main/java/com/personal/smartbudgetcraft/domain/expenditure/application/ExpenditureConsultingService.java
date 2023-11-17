@@ -2,9 +2,14 @@ package com.personal.smartbudgetcraft.domain.expenditure.application;
 
 import static com.personal.smartbudgetcraft.domain.deposit.application.DepositService.MIN_COST_UNIT;
 import static com.personal.smartbudgetcraft.domain.deposit.application.DepositService.PERCENT_UNIT;
+import static com.personal.smartbudgetcraft.domain.expenditure.constant.AdviceExpenditureComment.EXCEEDED_BUDGET;
+import static com.personal.smartbudgetcraft.domain.expenditure.constant.AdviceExpenditureComment.EXCEEDING_STANDARD;
+import static com.personal.smartbudgetcraft.domain.expenditure.constant.AdviceExpenditureComment.SAVING_WELL;
+import static com.personal.smartbudgetcraft.domain.expenditure.constant.AdviceExpenditureComment.SPENDING_APPROPRIATELY;
 
 import com.personal.smartbudgetcraft.domain.category.cost.dao.CostCategoryRepository;
 import com.personal.smartbudgetcraft.domain.category.cost.entity.CostCategory;
+import com.personal.smartbudgetcraft.domain.expenditure.dto.response.AdviceCommentResDto;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpenditureRecommendTodayResDto;
 import com.personal.smartbudgetcraft.domain.expenditure.dto.response.ExpendituresRecommendTodayResDto;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
@@ -213,5 +218,66 @@ public class ExpenditureConsultingService {
     int remainingDays = (int) ChronoUnit.DAYS.between(currentDate, lastDayOfMonth) + 1;
 
     return remainingDays;
+  }
+
+  /**
+   * 회원 상황에 맞는 멘트 호출
+   * 상황은 절약을 잘 하고 있는지 확인
+   * 원래 사용해야 할 예산과 지금까지 사용한 지출 비율 계산
+   *
+   * @param member 회원
+   * @return 회원 상황에 맞는 멘트
+   */
+  public AdviceCommentResDto adviceComment(Member member) {
+    // 오늘 날짜 구하기
+    int dayOfMonth = LocalDate.now().getDayOfMonth();
+    // 회원의 하루 예산 구하기
+    int dayOfDeposit = calculatorDayOfDeposit(member);
+    // 회원의 오늘까지 써야한 예산 금액 구하기
+    int remainTotalCost = dayOfMonth * dayOfDeposit;
+
+    // 회원의 총 지출
+    Integer totalExpenditureCost = member.getBudgetTracking().getTotalExpenditureCost();
+
+    // 회원의 상황 분석
+    // 원래 사용해야 할 예산과 지금까지 사용한 지출 비율 계산
+    double stateRate = (double) remainTotalCost / (double) totalExpenditureCost;
+    String comment = getAdvice(stateRate);
+
+    // 이번달의 남은 날짜 구하기
+    int remainingDays = calculatorRemainingDays();
+
+    // 회원의 총 예산 계산
+    Integer totalDepositCost = member.getBudgetTracking().getTotalDepositCost();
+    // 남은 예산 금액 계산
+    int remainDeposit = totalDepositCost - totalExpenditureCost;
+
+    // Res dto 생성
+    AdviceCommentResDto resDto = AdviceCommentResDto.builder()
+        .remainDeposit(remainDeposit)
+        .comment(comment)
+        .remainDays(remainingDays)
+        .build();
+
+    return resDto;
+  }
+
+  /**
+   * 상황에 맞게 멘트 반환
+   *
+   * @param rate 회원의 원래 하루 예산과 남은 하루 예산 비교의 비율
+   * @return 상황에 맞는 멘트
+   */
+  public String getAdvice(Double rate) {
+    if (rate >= SAVING_WELL.getStandard()) {
+      return SAVING_WELL.getComment();
+    }
+    if (rate >= SPENDING_APPROPRIATELY.getStandard()) {
+      return SPENDING_APPROPRIATELY.getComment();
+    }
+    if (rate >= EXCEEDING_STANDARD.getStandard()) {
+      return EXCEEDING_STANDARD.getComment();
+    }
+    return EXCEEDED_BUDGET.getComment();
   }
 }
