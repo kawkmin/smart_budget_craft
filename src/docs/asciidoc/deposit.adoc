@@ -70,4 +70,4 @@ Response
 include::{snippets}/delete-deposit/정상적으로_예산_삭제에_성공한다_204/http-response.adoc[]
 
 - 403 (회원이 삭제 권한이 없을 때)
-include::{snippets}/delete-deposit/회원이_작성하지_않은_예산을_수정하면_실패한다_403/http-response.adoc[]
+include::{snippets}/delete-deposit/회원이_작성하지_않은_예산을_삭제하면_실패한다_403/http-response.adoc[]
