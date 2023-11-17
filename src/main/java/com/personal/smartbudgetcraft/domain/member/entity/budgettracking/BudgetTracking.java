@@ -53,4 +53,22 @@ public class BudgetTracking {
         .totalExpenditureCost(0)
         .build();
   }
+
+  /**
+   * 총 예산 금액 변동
+   *
+   * @param cost 금액
+   */
+  public void updateDepositCost(Integer cost) {
+    this.totalDepositCost += cost;
+  }
+
+  /**
+   * 총 지출 금액 변동
+   *
+   * @param cost 금액
+   */
+  public void updateExpenditureCost(Integer cost) {
+    this.totalExpenditureCost += cost;
+  }
 }

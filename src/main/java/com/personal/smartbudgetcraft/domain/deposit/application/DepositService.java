@@ -9,6 +9,7 @@ import com.personal.smartbudgetcraft.domain.deposit.dto.response.DepositRecommen
 import com.personal.smartbudgetcraft.domain.deposit.dto.response.DepositResultResDto;
 import com.personal.smartbudgetcraft.domain.deposit.entity.Deposit;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
+import com.personal.smartbudgetcraft.domain.member.entity.budgettracking.BudgetTracking;
 import com.personal.smartbudgetcraft.global.error.BusinessException;
 import com.personal.smartbudgetcraft.global.error.ErrorCode;
 import java.util.ArrayList;
@@ -48,7 +49,9 @@ public class DepositService {
 
     // 이전의 카테고리에 대한 금액이 있을 때, 업데이트 로직 수행
     if (optionalPrevDeposit.isPresent()) {
-      return updateDepositCost(reqDto.getCost(), optionalPrevDeposit.get());
+      Long depositId = updateDepositCost(reqDto.getCost(), optionalPrevDeposit.get(),
+          member.getBudgetTracking());
+      return depositId;
     }
 
     // 이전의 카테고리에 대한 금액이 없을 때
@@ -59,6 +62,8 @@ public class DepositService {
 
     // 저장 후 id 갖기
     Long depositId = depositRepository.save(deposit).getId();
+    // 재산 트래킹 업데이트
+    member.getBudgetTracking().updateDepositCost(reqDto.getCost());
     return depositId;
   }
 
@@ -69,8 +74,10 @@ public class DepositService {
    * @param deposit 대상 예산
    * @return 업데이트 된 예산 id
    */
-  private Long updateDepositCost(Integer cost, Deposit deposit) {
+  private Long updateDepositCost(Integer cost, Deposit deposit, BudgetTracking budgetTracking) {
     deposit.addCost(cost);
+    // 재산 트래킹 업데이트
+    budgetTracking.updateDepositCost(cost);
     return deposit.getId();
   }
 
@@ -259,6 +266,8 @@ public class DepositService {
 
     // 수정
     foundDeposit.update(reqDto, foundCategory);
+    // 재산 트래킹 업데이트
+    member.getBudgetTracking().updateDepositCost(reqDto.getCost() - foundDeposit.getCost());
 
     return foundDeposit.getId();
   }
@@ -306,5 +315,7 @@ public class DepositService {
     Deposit foundDeposit = getDepositById(depositId);
 
     depositRepository.delete(foundDeposit);
+    // 재산 트래킹 업데이트
+    member.getBudgetTracking().updateDepositCost(-foundDeposit.getCost());
   }
 }
