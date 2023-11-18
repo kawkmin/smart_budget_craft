@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 지출 컨설팅 관련 컨트롤러
+ */
 @RestController
 @RequestMapping("api/v1/expenditure/consulting")
 @RequiredArgsConstructor
