@@ -138,3 +138,41 @@ Response
 - 200
 
 include::{snippets}/advice/정상적으로_멘트_호출이_실행된다/http-response.adoc[]
+
+== 지출 통계
+
+=== 지날달 지출 통계
+
+Request
+
+include::{snippets}/last-month-expenditure/저번달_지출_통계가_정상적으로_작동된다/http-request.adoc[]
+
+Response
+
+- 200
+
+include::{snippets}/last-month-expenditure/저번달_지출_통계가_정상적으로_작동된다/http-response.adoc[]
+
+=== 지날 요일 지출 통계
+
+Request
+
+include::{snippets}/last-day-expenditure/저난_요일_지출_통계가_정상적으로_작동된다/http-request.adoc[]
+
+Response
+
+- 200
+
+include::{snippets}/last-day-expenditure/저난_요일_지출_통계가_정상적으로_작동된다/http-response.adoc[]
+
+=== 다른 유저 대비 지출 통계
+
+Request
+
+include::{snippets}/other-member-expenditure/다른_유저_대비_지출_통계가_정상적으로_작동된다/http-request.adoc[]
+
+Response
+
+- 200
+
+include::{snippets}/other-member-expenditure/다른_유저_대비_지출_통계가_정상적으로_작동된다/http-response.adoc[]

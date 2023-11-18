@@ -484,6 +484,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_유저의_상황에_맞는_멘트_호출">유저의 상황에 맞는 멘트 호출</a></li>
 </ul>
 </li>
+<li><a href="#_지출_통계">지출 통계</a>
+<ul class="sectlevel2">
+<li><a href="#_지날달_지출_통계">지날달 지출 통계</a></li>
+<li><a href="#_지날_요일_지출_통계">지날 요일 지출 통계</a></li>
+<li><a href="#_다른_유저_대비_지출_통계">다른 유저 대비 지출 통계</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -655,7 +662,7 @@ Content-Length: 280
 
 {
   "status" : "error",
-  "message" : "[asdfasdfasdf12] passwordConfirm: 비밀번호는 특수문자를 포함한 8~16자리 수 여야만 합니다., [asdfasdfasdf12] password: 비밀번호는 특수문자를 포함한 8~16자리 수 여야만 합니다.",
+  "message" : "[asdfasdfasdf12] password: 비밀번호는 특수문자를 포함한 8~16자리 수 여야만 합니다., [asdfasdfasdf12] passwordConfirm: 비밀번호는 특수문자를 포함한 8~16자리 수 여야만 합니다.",
   "data" : null
 }</code></pre>
 </div>
@@ -1294,7 +1301,7 @@ Host: localhost:8080
   "cost" : 10000,
   "memo" : "테스트 메모",
   "isExcluded" : true,
-  "time" : "2023-11-17T23:31:31.1334672"
+  "time" : "2023-11-18T18:09:08.1955859"
 }</code></pre>
 </div>
 </div>
@@ -1396,7 +1403,7 @@ Content-Length: 233
     "categoryName" : "테스트 카테고리",
     "cost" : 10000,
     "memo" : "Test Memo",
-    "time" : "2023-11-17T23:31:31.0184674",
+    "time" : "2023-11-18T18:09:08.0905856",
     "excluded" : true
   }
 }</code></pre>
@@ -1471,25 +1478,25 @@ Content-Length: 925
       "expenditureId" : 1,
       "categoryName" : "테스트 카테고리",
       "cost" : 10000,
-      "time" : "2023-11-17T23:31:31.0664672",
+      "time" : "2023-11-18T18:09:08.1335845",
       "excluded" : true
     }, {
       "expenditureId" : 2,
       "categoryName" : "테스트 카테고리",
       "cost" : 10000,
-      "time" : "2023-11-17T23:31:31.0664672",
+      "time" : "2023-11-18T18:09:08.1335845",
       "excluded" : true
     }, {
       "expenditureId" : 3,
       "categoryName" : "테스트 카테고리",
       "cost" : 10000,
-      "time" : "2023-11-17T23:31:31.0664672",
+      "time" : "2023-11-18T18:09:08.1335845",
       "excluded" : true
     }, {
       "expenditureId" : 4,
       "categoryName" : "테스트 카테고리",
       "cost" : 10000,
-      "time" : "2023-11-17T23:31:31.0664672",
+      "time" : "2023-11-18T18:09:08.1335845",
       "excluded" : true
     } ],
     "totalCost" : 40000,
@@ -1824,6 +1831,122 @@ Content-Length: 208
     "remainDays" : 14,
     "remainDeposit" : 638800,
     "comment" : "잘 아끼고 있어요. 현명한 소비를 하고 계시네요"
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_지출_통계">지출 통계</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_지날달_지출_통계">지날달 지출 통계</h3>
+<div class="paragraph">
+<p>Request</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/v1/expenditure/statistics/last-month HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Response</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>200</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Content-Length: 99
+
+{
+  "status" : "success",
+  "message" : null,
+  "data" : {
+    "prepareCostSum" : 17600
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_지날_요일_지출_통계">지날 요일 지출 통계</h3>
+<div class="paragraph">
+<p>Request</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/v1/expenditure/statistics/last-day HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Response</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>200</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Content-Length: 98
+
+{
+  "status" : "success",
+  "message" : null,
+  "data" : {
+    "prepareCostSum" : 4000
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_다른_유저_대비_지출_통계">다른 유저 대비 지출 통계</h3>
+<div class="paragraph">
+<p>Request</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/v1/expenditure/statistics/other-member HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Response</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>200</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Content-Length: 100
+
+{
+  "status" : "success",
+  "message" : null,
+  "data" : {
+    "prepareCostSum" : -22000
   }
 }</code></pre>
 </div>
