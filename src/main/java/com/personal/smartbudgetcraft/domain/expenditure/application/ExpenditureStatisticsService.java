@@ -1,7 +1,7 @@
 package com.personal.smartbudgetcraft.domain.expenditure.application;
 
 import com.personal.smartbudgetcraft.domain.expenditure.dao.ExpenditureRepository;
-import com.personal.smartbudgetcraft.domain.expenditure.dto.response.StatisticsLastMonthResDto;
+import com.personal.smartbudgetcraft.domain.expenditure.dto.response.StatisticsResDto;
 import com.personal.smartbudgetcraft.domain.expenditure.entity.Expenditure;
 import com.personal.smartbudgetcraft.domain.member.entity.Member;
 import java.time.LocalDateTime;
@@ -19,14 +19,13 @@ public class ExpenditureStatisticsService {
 
   /**
    * 지난 달의 오늘 일차까지 해당하는 과거 모든 데이터 기록 대비 소비율 구하기
-   * TODO 카테고리 별 소비율 비교 등 다양한 비교
    *
    * @param member 회원
    * @return 지난 달의 오늘 일차까지 해당하는 과거 모든 데이터 기록 소비율 대비
    */
-  public StatisticsLastMonthResDto statisticsLastMonth(Member member) {
+  public StatisticsResDto statisticsLastMonth(Member member) {
 
-    // 현재 날짜와 시간 정보를 가져옵니다
+    // 현재 날짜와 시간 정보 구하기
     LocalDateTime now = LocalDateTime.now();
     // 이번 달의 1일을 구하기
     LocalDateTime firstDayOfThisMonth = now.withDayOfMonth(1).withHour(0).withMinute(0)
@@ -37,24 +36,66 @@ public class ExpenditureStatisticsService {
     LocalDateTime sameDayLastMonth = now.withHour(0).withMinute(0).withSecond(0).withNano(0)
         .minusMonths(1);
 
-    // 이번달의 회원의 지출 구하기
-    List<Expenditure> thisMonthExpenditure = expenditureRepository.findAllByTimeBetweenAndMember(
-        firstDayOfThisMonth, now, member);
-    // 저번달의 오늘 날짜에 해당하는 날 까지 지출 구하기
-    List<Expenditure> lastMonthExpenditure = expenditureRepository.findAllByTimeBetweenAndMember(
-        firstDayOfLastMonth, sameDayLastMonth, member);
+    // 소비율 계산
+    StatisticsResDto resDto = calculateExpenditureCostSum(
+        member, firstDayOfThisMonth, now, firstDayOfLastMonth, sameDayLastMonth);
 
-    // 이번달의 총 지출액
-    int thisMonthCostSum = thisMonthExpenditure.stream().mapToInt(Expenditure::getCost).sum();
-    // 저번달의 총 지출액
-    int lastMonthCostSum = lastMonthExpenditure.stream().mapToInt(Expenditure::getCost).sum();
+    return resDto;
+  }
+
+  /**
+   * 지난달의 오늘 요일의 오늘 대비 소비율 구하기
+   *
+   * @param member 회원
+   * @return 지난달의 오늘 요일의 오늘 대비 소비율
+   */
+  public StatisticsResDto statisticsLastDay(Member member) {
+    // 현재 날짜와 시간 정보를 구하기
+    LocalDateTime now = LocalDateTime.now();
+    // 오늘의 00시 00분 구하기
+    LocalDateTime todayMidnight = now.withHour(0).withMinute(0).withSecond(0).withNano(0);
+    // 저번달의 오늘 날짜의 같은 시간 구하기
+    LocalDateTime sameDayLastMonth = now.minusMonths(1);
+    // 저번달의 오늘 날짜의 00시 00분 구하기
+    LocalDateTime sameDayLastMonthMidnight = todayMidnight.minusMonths(1);
+
+    // 소비율 계산
+    StatisticsResDto resDto = calculateExpenditureCostSum(
+        member, todayMidnight, now, sameDayLastMonthMidnight, sameDayLastMonth);
+
+    return resDto;
+  }
+
+  /**
+   * 특정 기간의 지출액과 다른 특정 기간의 지출액을 비교하여, 소비율 계산
+   *
+   * @param member     회원
+   * @param startDate1 기간1의 시작일
+   * @param endDate1   기간1의 마지막일
+   * @param startDate2 기간2의 시작일
+   * @param endDate2   기간2의 마지막일
+   * @return 계산된 소비율
+   */
+  private StatisticsResDto calculateExpenditureCostSum(Member member, LocalDateTime startDate1,
+      LocalDateTime endDate1, LocalDateTime startDate2, LocalDateTime endDate2
+  ) {
+    // 기간1 동안의 지출 계산
+    List<Expenditure> Expenditures1 = expenditureRepository.findAllByTimeBetweenAndMember(
+        startDate1, endDate1, member);
+    // 기간2 동안의 지출 계산
+    List<Expenditure> Expenditures2 = expenditureRepository.findAllByTimeBetweenAndMember(
+        startDate2, endDate2, member);
+
+    // 기간1의 총 지출액
+    int sumCost1 = Expenditures1.stream().mapToInt(Expenditure::getCost).sum();
+    // 기간2의 총 지출액
+    int sumCost2 = Expenditures2.stream().mapToInt(Expenditure::getCost).sum();
     // 이번달과 저번달의 지출 차액
-    int prepareCostSum = thisMonthCostSum - lastMonthCostSum;
+    int prepareCostSum = sumCost1 - sumCost2;
 
-    StatisticsLastMonthResDto resDto = StatisticsLastMonthResDto.builder()
+    StatisticsResDto resDto = StatisticsResDto.builder()
         .prepareCostSum(prepareCostSum)
         .build();
-
     return resDto;
   }
 }

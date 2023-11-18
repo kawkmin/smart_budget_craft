@@ -4,16 +4,16 @@ import lombok.Builder;
 import lombok.Getter;
 
 /**
- * 지난 달 대비 총액, 카테고리 별 소비율 통계 데이터 정보
+ * 소비율 통계 데이터 정보
  */
 @Getter
-public class StatisticsLastMonthResDto {
+public class StatisticsResDto {
 
   // 대비 총액
   private Integer prepareCostSum;
 
   @Builder
-  public StatisticsLastMonthResDto(Integer prepareCostSum) {
+  public StatisticsResDto(Integer prepareCostSum) {
     this.prepareCostSum = prepareCostSum;
   }
 }
