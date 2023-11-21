@@ -295,11 +295,13 @@ public class 클래스명 {
 
 #### 1. 회원 상황에 맞는 멘트 호출
 
-![image](https://github.com/kawkmin/geoRecommendEats/assets/86940335/ad1b559e-c9b9-427b-9f21-1ddd698d35cb)
+![image](https://github.com/kawkmin/smart_budget_craft/assets/86940335/f361bd15-9ba6-443c-a6b4-1bbf10ec3389)
+
 
 #### 2. 회원의 오늘 카테고리별 지출 추천
 
-![image](https://github.com/kawkmin/geoRecommendEats/assets/86940335/11b766d0-4c91-4d75-8403-1ab1e36ac118)
+![image](https://github.com/kawkmin/smart_budget_craft/assets/86940335/10485f68-fa19-4424-8539-322d77e620e1)
+
 
 ## [📌프로젝트 일정관리](#목차)
 
