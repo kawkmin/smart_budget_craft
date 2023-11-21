@@ -22,13 +22,13 @@
 2. [코드 컨벤션 규칙](#코드-컨벤션-규칙)
 3. [프로젝트 개요 및 서비스 개요](#프로젝트-개요-및-서비스-개요)
 4. [요구사항 분석](#요구사항-분석)
-5. [프로젝트 동작](#프로젝트-동작)
+5. [프로젝트 동작 예시](#프로젝트-동작-예시)
 6. [프로젝트 일정관리](#프로젝트-일정관리)
 7. [ERD](#erd)
 8. [프로젝트 패키지 구조](#프로젝트-패키지-구조)
 9. [API 명세](#api-명세)
 10. [테스트](#테스트)
-11. [TIL 및 회고](#TIL-및-회고)
+11. [TIL 및 회고](#til-및-회고)
 
 ## [📌개발 기간](#목차)
 
@@ -144,7 +144,7 @@ public class 클래스명 {
 
 ## [📌프로젝트 개요 및 서비스 개요](#목차)
 
-본 서비스는 사용자들이 개인 재무를 관리하고 지출을 추적하는 데 도움을 주는 서비스입니다.
+**본 서비스는 사용자들이 개인 재무를 관리하고 지출을 추적하는 데 도움을 주는 서비스입니다.**
 
 - 사용자들이 예산을 설정하고 지출을 모니터링하며 재무 목표를 달성하는 데 도움이 됩니다.
 
@@ -152,6 +152,8 @@ public class 클래스명 {
 
 <details>
     <summary>서비스 개요 자세히 (클릭)</summary>
+
+``` markdown 
 
 #### 1. 회원은 회원가입을 해야 서비스를 이용할 수 있습니다.
 
@@ -175,6 +177,7 @@ public class 클래스명 {
 #### 5. 지출 통계
 
 - `지난 달 대비` , `지난 요일 대비`, `다른 유저 대비` 등 여러 기준 카테고리 별 지출 통계를 확인 할 수 있습니다.
+```
 
 </details>
 
@@ -187,6 +190,7 @@ public class 클래스명 {
 <details>
     <summary>요구사항 분석 자세히 (클릭)</summary>
 
+``` markdown
 ### 1. 유저
 
 1. 사용자 회원가입
@@ -281,10 +285,11 @@ public class 클래스명 {
 - 두가지 경우로 구현 가능
     1. 요구한 돈에서 +- 300원 오차 발생하지만, 정확한 퍼센트로 추천. (채택)
     2. 돈에 딱 맞게 추천하지만, 정확한 퍼센트는 아님.
+```
 
 </details>
 
-## [📌프로젝트 동작](#목차)
+## [📌프로젝트 동작 예시](#목차)
 
 ### `Discord webHook` 을 통해 구현하였습니다.
 
@@ -323,7 +328,7 @@ public class 클래스명 {
 
 ![image](https://github.com/kawkmin/geoRecommendEats/assets/86940335/29b1eebb-16d8-4834-bf9b-5422940fb4a8)
 
-## [📌프로젝트 패키지 구조](#목차#목차)
+## [📌프로젝트 패키지 구조](#목차)
 
 <details>
     <summary>자세히 (클릭)</summary>
@@ -408,7 +413,8 @@ src
 
 **Spring Rest Docs 기반 API 명세서**
 
-[API 명세서 Html로 보기 (클릭)](https://kawkmin.github.io/smart_budget_craft/src/main/resources/static/index.html)
+### [API 명세서 Html로 보기 (클릭)](https://kawkmin.github.io/smart_budget_craft/src/main/resources/static/index.html)
+
 ![image](https://github.com/kawkmin/geoRecommendEats/assets/86940335/c7af00e9-a19a-4549-84cd-704e9e86cf78)
 
 ## [📌테스트](#목차)
@@ -419,7 +425,7 @@ src
 
 ![image](https://github.com/kawkmin/geoRecommendEats/assets/86940335/3cd4bccb-ab19-46ce-9b60-ac8cc2010400)
 
-## [TIL 및 회고](#목차)
+## [📌TIL 및 회고](#목차)
 
 [N+1을 해결하는 BatchSize와 fetchJoin의 차이는 무엇일까?](https://invincible-sesame-584.notion.site/N-1-BatchSize-fetchJoin-7a96b68f3ba34bec98542735cd9ddca1)
 
