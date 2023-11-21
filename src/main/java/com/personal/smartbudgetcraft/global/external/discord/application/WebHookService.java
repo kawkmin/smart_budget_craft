@@ -28,18 +28,27 @@ public class WebHookService {
    * @param member 회원
    */
   public void callAdviceComment(Member member) {
+    // 예산 조언 계산 결과 가져오기
     AdviceCommentResDto adviceResDto = expenditureConsultingService.adviceComment(member);
 
-    String adviceComment = adviceResDto.getComment();
-    String remainDayComment = "남은 요일 : " + adviceResDto.getRemainDays() + "일";
-    String remainDepositComment = "남은 예산 금액 " + adviceResDto.getRemainDeposit() + "원";
+    // 조언 멘트 
+    String adviceComment = "## 🔔 " + adviceResDto.getComment();
 
-    StringBuilder sb = new StringBuilder();
-    sb.append(adviceComment).append("\n")
+    // 남은 요일 멘트
+    String remainDayComment = "> 남은 요일 : `" + adviceResDto.getRemainDays() + "`일";
+
+    // 남은 예산 금액 멘트
+    String remainDepositComment = "> 남은 예산 금액 `" + adviceResDto.getRemainDeposit() + "`원";
+
+    // 문자열로 포맷팅
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("")
+        .append(adviceComment).append("\n")
         .append(remainDayComment).append("\n")
         .append(remainDepositComment);
-    String content = sb.toString();
+    String content = stringBuilder.toString();
 
+    // Json Object로 변경 후 알람 보내기
     JSONObject data = new JSONObject();
     data.put("content", content);
     send(data);
